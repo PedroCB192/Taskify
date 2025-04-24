@@ -45,7 +45,7 @@ class _LoginState extends State<Login> {
       setState(() => _isLoading = false);
 
       if (user != null) {
-        Navigator.of(context).pushReplacementNamed('/home');
+        Navigator.of(context).pushReplacementNamed('/tasks');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Error desconocido al iniciar sesión')),
@@ -80,8 +80,8 @@ class _LoginState extends State<Login> {
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
-          child: Form(  // Añadido el widget Form aquí
-            key: _formKey,  // La key va en el Form, no en el Center
+          child: Form(
+            key: _formKey,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -111,7 +111,7 @@ class _LoginState extends State<Login> {
                   },
                 ),
                 const SizedBox(height: 16),
-                // Password (cambiado a TextFormField)
+                // Password
                 TextFormField(
                   controller: _passwordController,
                   obscureText: true,
@@ -142,7 +142,7 @@ class _LoginState extends State<Login> {
                     Expanded(
                       child: ElevatedButton(
                         onPressed: _isLoading ? null : _login,
-                        child: _isLoading 
+                        child: _isLoading
                             ? const CircularProgressIndicator()
                             : const Text('Login'),
                       ),

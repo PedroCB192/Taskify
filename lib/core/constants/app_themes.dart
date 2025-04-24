@@ -2,10 +2,42 @@ import 'package:flutter/material.dart';
 import 'package:taskify/core/constants/app_colors.dart';
 
 ThemeData appLightTheme = ThemeData(
-  // Color de fondo global
+  // ========== Global ==========
   scaffoldBackgroundColor: AppColors.backgroundLight,
 
-  // Estilo de TextFields
+  // ========== AppBar Global ==========
+    appBarTheme: AppBarTheme(
+      backgroundColor: AppColors.argentinianBlue,
+      foregroundColor: Colors.white,
+      centerTitle: true,
+      elevation: 2,
+      titleTextStyle: const TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.w600,
+      ),
+    ),
+
+    // ========== BottomAppBar Global ==========
+    bottomAppBarTheme: BottomAppBarTheme(
+      color: AppColors.vistaBlue,
+      elevation: 8,
+      shape: const CircularNotchedRectangle(),
+    ),
+
+    // ========== FloatingActionButton ==========
+    floatingActionButtonTheme: FloatingActionButtonThemeData(
+      backgroundColor: AppColors.roseBonbon,
+      foregroundColor: Colors.white,
+      elevation: 4,
+    ),
+
+    // ========== IconButtons (BottomNav) ==========
+    iconTheme: IconThemeData(
+      color: Colors.white, // Color por defecto
+      size: 28,
+    ),
+
+  // ========== TextTheme ==========
   inputDecorationTheme: InputDecorationTheme(
     border: OutlineInputBorder(
       borderRadius: BorderRadius.circular(10),
@@ -17,7 +49,7 @@ ThemeData appLightTheme = ThemeData(
     labelStyle: TextStyle(color: AppColors.textSecondary),
   ),
 
-  // Estilo de botones elevados (ElevatedButton)
+  // ========== ElevatedButton ==========
   elevatedButtonTheme: ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
       backgroundColor: AppColors.roseBonbon,
@@ -29,7 +61,7 @@ ThemeData appLightTheme = ThemeData(
     ),
   ),
 
-  // Estilo de botones con borde (OutlinedButton)
+  // ========== OutlinedButton ==========
   outlinedButtonTheme: OutlinedButtonThemeData(
     style: OutlinedButton.styleFrom(
       side: BorderSide(color: AppColors.argentinianBlue),
@@ -40,7 +72,7 @@ ThemeData appLightTheme = ThemeData(
     ),
   ),
 
-  // Texto de botones
+  // ========== TextButton ==========
   textButtonTheme: TextButtonThemeData(
     style: TextButton.styleFrom(
       foregroundColor: AppColors.argentinianBlue,

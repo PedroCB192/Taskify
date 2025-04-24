@@ -15,6 +15,7 @@ class _RegisterState extends State<Register> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _usernameController = TextEditingController(); // Nuevo controller para username
   final AuthService _auth = AuthService();
   bool _isLoading = false;
 
@@ -22,55 +23,61 @@ class _RegisterState extends State<Register> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _usernameController.dispose(); // No olvidar limpiar este también
     super.dispose();
   }
-  
   // Register function
+  // Función de registro mejorada
   Future<void> _register() async {
-    if (_formKey.currentState == null || !_formKey.currentState!.validate()) {
-      return;
-    }
+    if (!_formKey.currentState!.validate()) return;
 
-    // Ocultar el teclado al hacer login
     FocusScope.of(context).unfocus();
-
     setState(() => _isLoading = true);
     
     try {
       final user = await _auth.registerWithEmailAndPassword(
-        _emailController.text,
-        _passwordController.text,
+        _emailController.text.trim(),
+        _passwordController.text.trim(),
+        _usernameController.text.trim(), // Pasamos el username
       );
 
-      setState(() => _isLoading = false);
-
       if (user != null) {
-        Navigator.of(context).pushReplacementNamed('/home');
-      } else {
+        // Registro exitoso
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error desconocido al iniciar sesión')),
+          const SnackBar(
+            content: Text('¡Registro exitoso!'),
+            duration: Duration(seconds: 2),
+          ),
         );
+        Navigator.of(context).pushReplacementNamed('/home');
       }
-    } on FirebaseAuthException catch (e) {  // <--- AQUÍ VA EL BLOQUE DE MANEJO DE ERRORES
-      setState(() => _isLoading = false);
-      String message = 'Login failed';
-      if (e.code == 'user-not-found') {
-        message = 'No user found with this email';
-      } else if (e.code == 'wrong-password') {
-        message = 'Incorrect password';
-      } else if (e.code == 'too-many-requests') {
-        message = 'Too many attempts. Account temporarily locked';
-      } else if (e.code == 'invalid-email') {
-        message = 'Invalid email format';
+    } on FirebaseAuthException catch (e) {
+      String message = 'Error al registrar';
+      switch (e.code) {
+        case 'email-already-in-use':
+          message = 'El email ya está registrado';
+          break;
+        case 'invalid-email':
+          message = 'Formato de email inválido';
+          break;
+        case 'weak-password':
+          message = 'La contraseña debe tener al menos 6 caracteres';
+          break;
+        case 'operation-not-allowed':
+          message = 'Operación no permitida';
+          break;
+        default:
+          message = 'Error desconocido: ${e.message}';
       }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(message)),
       );
-    } catch (e) {  // Captura cualquier otro error no específico de Firebase
-      setState(() => _isLoading = false);
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('An unexpected error occurred: ${e.toString()}')),
+        SnackBar(content: Text('Error inesperado: ${e.toString()}')),
       );
+    } finally {
+      setState(() => _isLoading = false);
     }
   }
 
@@ -80,8 +87,8 @@ class _RegisterState extends State<Register> {
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
-          child: Form(  // Añadido el widget Form aquí
-            key: _formKey,  // La key va en el Form, no en el Center
+          child: Form(
+            key: _formKey,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -95,6 +102,28 @@ class _RegisterState extends State<Register> {
                   ),
                 ),
                 const SizedBox(height: 40),
+                // Campo de Username (nuevo)
+                TextFormField(
+                  controller: _usernameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Username',
+                  ),
+                  textCapitalization: TextCapitalization.none,
+                  autocorrect: false,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your username';
+                    }
+                    if (value.length < 4) {
+                      return 'The username must be at least 4 characters';
+                    }
+                    if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(value)) {
+                      return 'Only letters, numbers, and underscores are allowed';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
                 // Email
                 TextFormField(
                   controller: _emailController,
@@ -111,7 +140,7 @@ class _RegisterState extends State<Register> {
                   },
                 ),
                 const SizedBox(height: 16),
-                // Password (cambiado a TextFormField)
+                // Password
                 TextFormField(
                   controller: _passwordController,
                   obscureText: true,
@@ -132,8 +161,10 @@ class _RegisterState extends State<Register> {
                   children: [
                     Expanded(
                       child: OutlinedButton(
-                        onPressed: _register,
-                        child: const Text('Create Account'),
+                        onPressed: _isLoading ? null : _register,
+                        child: _isLoading 
+                            ? const CircularProgressIndicator()
+                            : const Text('Create Account'),
                       ),
                     ),
                   ],
