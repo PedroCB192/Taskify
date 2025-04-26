@@ -1,20 +1,51 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:taskify/core/constants/app_themes.dart';
+import 'package:taskify/features/tasks/provider/task_provider.dart';
 import 'package:taskify/features/auth/datasourse/auth_wrapper.dart';
 import 'package:taskify/features/auth/screens/login.dart';
 import 'package:taskify/features/auth/screens/register.dart';
 import 'package:taskify/features/calendar/screens/calendar.dart';
 import 'package:taskify/features/categories/screens/categories.dart';
 import 'package:taskify/features/profile/screens/profile.dart';
+import 'package:taskify/features/tasks/models/task.dart';
+import 'package:taskify/features/tasks/models/category.dart';
+import 'package:taskify/features/tasks/models/subtask.dart';
 import 'package:taskify/features/tasks/screens/tasks.dart';
 import 'package:taskify/features/tasks/widgets/tasks_create_modal.dart';
 import 'package:taskify/firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Inicializar Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(const MainApp());
+
+  // Inicializar Hive
+  await Hive.initFlutter();
+  // Limpiar las cajas de Hive (solo para desarrollo)
+  /*
+  await Hive.deleteBoxFromDisk('tasks');
+  await Hive.deleteBoxFromDisk('categories');
+  await Hive.deleteBoxFromDisk('subtasks');
+  */
+  // Registrar adaptadores
+  Hive.registerAdapter(TaskAdapter());
+  Hive.registerAdapter(CategoryAdapter());
+  Hive.registerAdapter(SubtaskAdapter());
+
+  // Abrir cajas
+  await Hive.openBox<Task>('tasks');
+  await Hive.openBox<Category>('categories');
+
+  runApp(
+    MultiProvider(
+      providers: [ChangeNotifierProvider(create: (_) => TaskProvider())],
+      child: const MainApp(),
+    ),
+  );
 }
 
 class MainApp extends StatelessWidget {
