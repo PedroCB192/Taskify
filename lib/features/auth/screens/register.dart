@@ -15,7 +15,8 @@ class _RegisterState extends State<Register> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _usernameController = TextEditingController(); // Nuevo controller para username
+  final _usernameController =
+      TextEditingController(); // Nuevo controller para username
   final AuthService _auth = AuthService();
   bool _isLoading = false;
 
@@ -26,6 +27,7 @@ class _RegisterState extends State<Register> {
     _usernameController.dispose(); // No olvidar limpiar este también
     super.dispose();
   }
+
   // Register function
   // Función de registro mejorada
   Future<void> _register() async {
@@ -33,7 +35,7 @@ class _RegisterState extends State<Register> {
 
     FocusScope.of(context).unfocus();
     setState(() => _isLoading = true);
-    
+
     try {
       final user = await _auth.registerWithEmailAndPassword(
         _emailController.text.trim(),
@@ -49,7 +51,7 @@ class _RegisterState extends State<Register> {
             duration: Duration(seconds: 2),
           ),
         );
-        Navigator.of(context).pushReplacementNamed('/home');
+        Navigator.of(context).pushReplacementNamed('/tasks');
       }
     } on FirebaseAuthException catch (e) {
       String message = 'Error al registrar';
@@ -69,9 +71,9 @@ class _RegisterState extends State<Register> {
         default:
           message = 'Error desconocido: ${e.message}';
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error inesperado: ${e.toString()}')),
@@ -105,9 +107,7 @@ class _RegisterState extends State<Register> {
                 // Campo de Username (nuevo)
                 TextFormField(
                   controller: _usernameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Username',
-                  ),
+                  decoration: const InputDecoration(labelText: 'Username'),
                   textCapitalization: TextCapitalization.none,
                   autocorrect: false,
                   validator: (value) {
@@ -133,7 +133,9 @@ class _RegisterState extends State<Register> {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your email';
                     }
-                    if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(value)) {
+                    if (!RegExp(
+                      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+                    ).hasMatch(value)) {
                       return 'Please enter a valid email';
                     }
                     return null;
@@ -162,9 +164,10 @@ class _RegisterState extends State<Register> {
                     Expanded(
                       child: OutlinedButton(
                         onPressed: _isLoading ? null : _register,
-                        child: _isLoading 
-                            ? const CircularProgressIndicator()
-                            : const Text('Create Account'),
+                        child:
+                            _isLoading
+                                ? const CircularProgressIndicator()
+                                : const Text('Create Account'),
                       ),
                     ),
                   ],
