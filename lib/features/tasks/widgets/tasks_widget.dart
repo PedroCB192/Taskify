@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // Import the intl package
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:taskify/features/tasks/models/task.dart';
-import 'package:taskify/features/tasks/widgets/subtask_widget.dart';
+import 'package:taskify/features/tasks/widgets/subtasks_widget.dart';
 import 'package:taskify/features/tasks/provider/task_provider.dart';
-import 'package:taskify/features/tasks/widgets/task_edit_modal.dart';
+import 'package:taskify/features/tasks/widgets/tasks_edit_modal.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class TaskWidget extends StatefulWidget {
   final Task task;
@@ -20,6 +21,7 @@ class TaskWidget extends StatefulWidget {
     required this.isExpanded,
     required this.onExpansionChanged,
     required this.onTaskUpdated,
+    required Future<Null> Function() onTap,
   });
 
   @override
@@ -40,33 +42,47 @@ class _TaskWidgetState extends State<TaskWidget> {
       decoration: BoxDecoration(
         border: Border.all(
           color: taskColor, // Use category color or grey if completed
-          width: 2.0, // Border width
+          width: 2.0,
         ),
-        borderRadius: BorderRadius.circular(8.0), // Rounded corners
+        borderRadius: BorderRadius.circular(8.0),
       ),
       child: GestureDetector(
         onTap: () {
-          // Abrir el modal de edición al presionar cualquier parte de la tarea
+          // Open the edit modal when the task is tapped
           showModalBottomSheet(
             context: context,
             isScrollControlled: true,
-            builder: (context) => TaskEditModal(task: widget.task),
+            builder: (context) => TasksEditModal(task: widget.task),
           );
         },
         child: Column(
           children: [
             ListTile(
               leading: GestureDetector(
-                onTap: () {
-                  // Toggle task completion
-                  final updatedTask = widget.task.copyWith(
-                    completed: !widget.task.completed,
-                  );
-                  Provider.of<TaskProvider>(
-                    context,
-                    listen: false,
-                  ).updateTask(updatedTask);
-                  widget.onTaskUpdated();
+                onTap: () async {
+                  try {
+                    final player = AudioPlayer();
+
+                    if (widget.task.completed) {
+                      // Reproducir sonido "pop-off" al descompletar
+                      await player.play(AssetSource('sounds/pop-off.mp3'));
+                    } else {
+                      // Reproducir sonido "pop-on" al completar
+                      await player.play(AssetSource('sounds/pop-on.mp3'));
+                    }
+
+                    // Toggle task completion
+                    final updatedTask = widget.task.copyWith(
+                      completed: !widget.task.completed,
+                    );
+                    Provider.of<TaskProvider>(
+                      context,
+                      listen: false,
+                    ).updateTask(updatedTask);
+                    widget.onTaskUpdated();
+                  } catch (e) {
+                    print('Error reproduciendo el sonido: $e');
+                  }
                 },
                 child: Container(
                   width: 24,
@@ -104,7 +120,6 @@ class _TaskWidgetState extends State<TaskWidget> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 4),
-                  // Add spacing between title and subtitle
                   Text(
                     'Due: $formattedDate', // Use the formatted date
                     style: const TextStyle(color: Colors.grey),
@@ -134,7 +149,6 @@ class _TaskWidgetState extends State<TaskWidget> {
                             setState(() {
                               subtask.completed = !subtask.completed;
                             });
-
                             // Update the task in the provider
                             final updatedTask = widget.task.copyWith(
                               subtasks: widget.task.subtasks,
@@ -143,7 +157,6 @@ class _TaskWidgetState extends State<TaskWidget> {
                               context,
                               listen: false,
                             ).updateTask(updatedTask);
-
                             widget.onTaskUpdated();
                           },
                         );

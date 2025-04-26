@@ -7,6 +7,7 @@ import 'package:taskify/features/tasks/models/task.dart';
 import 'package:taskify/features/tasks/models/subtask.dart';
 import 'package:taskify/features/tasks/services/task_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class TasksCreateModal extends StatefulWidget {
   const TasksCreateModal({super.key});
@@ -157,14 +158,14 @@ class _TasksCreateModalState extends State<TasksCreateModal> {
                             isPremium,
                           );
 
-                          // Actualizar la lista de categorías y seleccionar la nueva
+                          // Update the list of categories and select the new one
                           setState(() {
                             categories.add(newCategory); // Add to local list
                             selectedCategory =
                                 newCategory.id; // Select new category
                           });
 
-                          // Actualizar el estado principal para reflejar los cambios
+                          // Update the dropdown value
                           if (mounted) {
                             this.setState(() {
                               selectedCategory = newCategory.id;
@@ -188,13 +189,13 @@ class _TasksCreateModalState extends State<TasksCreateModal> {
 
   @override
   void dispose() {
-    // Liberar los controladores de subtareas
+    // Dispose of all subtask controllers
     for (var controller in _subtaskControllers) {
       controller.dispose();
     }
-    // Liberar el controlador de categoría si se usa
+    // Dispose of the category controller
     categoryController.dispose();
-    // Liberar el controlador del nombre de la tarea
+    // Dispose of the task name controller
     _taskNameController.dispose();
     super.dispose();
   }
@@ -219,7 +220,6 @@ class _TasksCreateModalState extends State<TasksCreateModal> {
               style: TextStyle(fontSize: 25, color: AppColors.roseBonbon),
             ),
             const SizedBox(height: 10),
-
             // Task Name Field
             TextField(
               controller: _taskNameController,
@@ -229,7 +229,6 @@ class _TasksCreateModalState extends State<TasksCreateModal> {
               ),
             ),
             const SizedBox(height: 10),
-
             // Subtasks
             if (_subtaskControllers.isNotEmpty)
               ListView.builder(
@@ -305,7 +304,6 @@ class _TasksCreateModalState extends State<TasksCreateModal> {
                   ),
                 ),
                 const SizedBox(width: 10),
-
                 // Date Picker Button
                 Expanded(
                   child: OutlinedButton(
@@ -314,7 +312,6 @@ class _TasksCreateModalState extends State<TasksCreateModal> {
                   ),
                 ),
                 const SizedBox(width: 10),
-
                 // Add Subtask Button
                 Expanded(
                   child: OutlinedButton(
@@ -323,12 +320,15 @@ class _TasksCreateModalState extends State<TasksCreateModal> {
                   ),
                 ),
                 const SizedBox(width: 10),
-
                 // Create Task Button
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () async {
                       try {
+                        // Reproducir el sonido "pop-on"
+                        final player = AudioPlayer();
+                        await player.play(AssetSource('sounds/pop-on.mp3'));
+
                         final user = FirebaseAuth.instance.currentUser;
                         if (user == null)
                           throw Exception('User not authenticated');
@@ -367,11 +367,11 @@ class _TasksCreateModalState extends State<TasksCreateModal> {
                         // Guardar la tarea
                         await TaskService().addTask(newTask, isPremium);
 
-                        // Notificar al padre que recargue las tareas
+                        // Notificar el cambio
                         Navigator.pop(
                           context,
                           true,
-                        ); // Aquí cerramos el modal y devolvemos true
+                        ); // Cerrar el modal y devolver true
                       } catch (e) {
                         print('Error saving task: $e');
                       }

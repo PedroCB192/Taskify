@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:taskify/features/tasks/models/task.dart';
 import 'package:taskify/features/tasks/services/category_service.dart';
-import 'package:taskify/features/tasks/widgets/task_widget.dart';
+import 'package:taskify/features/tasks/widgets/tasks_edit_modal.dart';
+import 'package:taskify/features/tasks/widgets/tasks_widget.dart';
 import 'package:taskify/features/tasks/provider/task_provider.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class Tasks extends StatefulWidget {
   const Tasks({super.key});
@@ -115,15 +117,32 @@ class _TasksState extends State<Tasks> {
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: const Icon(Icons.delete, color: Colors.white),
                 ),
-                onDismissed: (direction) {
+                onDismissed: (direction) async {
+                  final player = AudioPlayer();
+
                   if (direction == DismissDirection.startToEnd) {
-                    // Mark task as completed
-                    final updatedTask = task.copyWith(completed: true);
-                    Provider.of<TaskProvider>(
-                      context,
-                      listen: false,
-                    ).updateTask(updatedTask);
+                    // Play sound when the task is toggled
+                    if (task.completed) {
+                      // If the task is completed, mark it as not completed
+                      await player.play(AssetSource('sounds/pop-off.mp3'));
+                      final updatedTask = task.copyWith(completed: false);
+                      Provider.of<TaskProvider>(
+                        context,
+                        listen: false,
+                      ).updateTask(updatedTask);
+                    } else {
+                      // If the task is not completed, mark it as completed
+                      await player.play(AssetSource('sounds/pop-on.mp3'));
+                      final updatedTask = task.copyWith(completed: true);
+                      Provider.of<TaskProvider>(
+                        context,
+                        listen: false,
+                      ).updateTask(updatedTask);
+                    }
                   } else if (direction == DismissDirection.endToStart) {
+                    // Play sound when the task is deleted
+                    await player.play(AssetSource('sounds/pop-off.mp3'));
+
                     // Delete the task
                     Provider.of<TaskProvider>(
                       context,
@@ -141,6 +160,21 @@ class _TasksState extends State<Tasks> {
                       context,
                       listen: false,
                     ).loadTasks();
+                  },
+                  onTap: () async {
+                    final result = await showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      builder: (context) => TasksEditModal(task: task),
+                    );
+
+                    // Recargar las tareas si se realizó una modificación
+                    if (result == true) {
+                      Provider.of<TaskProvider>(
+                        context,
+                        listen: false,
+                      ).loadTasks();
+                    }
                   },
                 ),
               );

@@ -7,17 +7,18 @@ import 'package:taskify/features/tasks/models/category.dart';
 import 'package:taskify/features/tasks/services/category_service.dart';
 import 'package:provider/provider.dart';
 import 'package:taskify/features/tasks/provider/task_provider.dart';
+import 'package:audioplayers/audioplayers.dart';
 
-class TaskEditModal extends StatefulWidget {
+class TasksEditModal extends StatefulWidget {
   final Task task; // Recibe la tarea como parámetro
 
-  const TaskEditModal({super.key, required this.task});
+  const TasksEditModal({super.key, required this.task});
 
   @override
-  State<TaskEditModal> createState() => _TaskEditModalState();
+  State<TasksEditModal> createState() => _TaskEditModalState();
 }
 
-class _TaskEditModalState extends State<TaskEditModal> {
+class _TaskEditModalState extends State<TasksEditModal> {
   late TextEditingController _taskNameController;
   late DateTime _selectedDate;
   late List<TextEditingController> _subtaskControllers;
@@ -331,15 +332,23 @@ class _TaskEditModalState extends State<TaskEditModal> {
                 // Delete Button
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {
-                      // Lógica para eliminar la tarea
-                      Provider.of<TaskProvider>(
-                        context,
-                        listen: false,
-                      ).deleteTask(widget.task.id);
+                    onPressed: () async {
+                      try {
+                        // Reproducir el sonido "pop-off"
+                        final player = AudioPlayer();
+                        await player.play(AssetSource('sounds/pop-off.mp3'));
 
-                      // Cerrar el modal después de eliminar
-                      Navigator.pop(context);
+                        // Eliminar la tarea
+                        Provider.of<TaskProvider>(
+                          context,
+                          listen: false,
+                        ).deleteTask(widget.task.id);
+
+                        // Cerrar el modal después de eliminar
+                        Navigator.pop(context);
+                      } catch (e) {
+                        print('Error deleting task: $e');
+                      }
                     },
                     child: const Icon(Icons.delete),
                     style: ElevatedButton.styleFrom(
@@ -352,30 +361,42 @@ class _TaskEditModalState extends State<TaskEditModal> {
                 // Save Button
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {
-                      final updatedSubtasks =
-                          _subtaskControllers
-                              .map(
-                                (controller) => Subtask(
-                                  name: controller.text.trim(),
-                                  completed: false,
-                                ),
-                              )
-                              .toList();
+                    onPressed: () async {
+                      try {
+                        // Reproducir el sonido "pop-on"
+                        final player = AudioPlayer();
+                        await player.play(AssetSource('sounds/pop-on.mp3'));
 
-                      final updatedTask = widget.task.copyWith(
-                        name: _taskNameController.text.trim(),
-                        date: _selectedDate,
-                        subtasks: updatedSubtasks,
-                        categoryId: _selectedCategory,
-                      );
+                        // Obtener las subtareas
+                        final subtasks =
+                            _subtaskControllers
+                                .map(
+                                  (controller) => Subtask(
+                                    name: controller.text.trim(),
+                                    completed: false,
+                                  ),
+                                )
+                                .toList();
 
-                      Provider.of<TaskProvider>(
-                        context,
-                        listen: false,
-                      ).updateTask(updatedTask);
+                        // Actualizar la tarea existente
+                        final updatedTask = widget.task.copyWith(
+                          name: _taskNameController.text.trim(),
+                          date: _selectedDate,
+                          subtasks: subtasks,
+                          categoryId: _selectedCategory,
+                        );
 
-                      Navigator.pop(context);
+                        // Guardar la tarea actualizada
+                        Provider.of<TaskProvider>(
+                          context,
+                          listen: false,
+                        ).updateTask(updatedTask);
+
+                        // Cerrar el modal y notificar el cambio
+                        Navigator.pop(context, true);
+                      } catch (e) {
+                        print('Error updating task: $e');
+                      }
                     },
                     child: const Icon(Icons.check),
                   ),

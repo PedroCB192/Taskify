@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:taskify/features/tasks/models/subtask.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class SubtaskWidget extends StatelessWidget {
   final Subtask subtask;
@@ -14,7 +15,24 @@ class SubtaskWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onSubtaskToggled, // Toggle subtask completion
+      onTap: () async {
+        try {
+          final player = AudioPlayer();
+
+          if (subtask.completed) {
+            // Reproducir sonido "pop-off" al descompletar
+            await player.play(AssetSource('sounds/pop-off.mp3'));
+          } else {
+            // Reproducir sonido "pop-on" al completar
+            await player.play(AssetSource('sounds/pop-on.mp3'));
+          }
+
+          // Toggle subtask completion
+          onSubtaskToggled();
+        } catch (e) {
+          print('Error reproduciendo el sonido: $e');
+        }
+      },
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 4.0),
         decoration: BoxDecoration(
