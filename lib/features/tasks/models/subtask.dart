@@ -8,7 +8,7 @@ class Subtask {
   final String name;
 
   @HiveField(1)
-  final bool completed;
+  bool completed;
 
   Subtask({required this.name, this.completed = false});
 

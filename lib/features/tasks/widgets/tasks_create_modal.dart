@@ -188,183 +188,204 @@ class _TasksCreateModalState extends State<TasksCreateModal> {
 
   @override
   void dispose() {
+    // Liberar los controladores de subtareas
     for (var controller in _subtaskControllers) {
       controller.dispose();
     }
+    // Liberar el controlador de categoría si se usa
+    categoryController.dispose();
+    // Liberar el controlador del nombre de la tarea
+    _taskNameController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        // Title
-        Text(
-          'New Task',
-          style: TextStyle(fontSize: 25, color: AppColors.roseBonbon),
+    return SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+          left: 16.0,
+          right: 16.0,
+          top: 16.0,
         ),
-        SizedBox(height: 10),
-        TextField(
-          controller: _taskNameController,
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
-            labelText: 'Task Name',
-          ),
-        ),
-        SizedBox(height: 10),
-        if (_subtaskControllers.isNotEmpty)
-          ListView.builder(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            itemCount: _subtaskControllers.length,
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 6),
-                child: Row(
-                  children: [
-                    IconButton(
-                      onPressed: () => _removeSubtaskField(index),
-                      icon: Icon(Icons.close, color: AppColors.lavenderFloral),
-                    ),
-                    Expanded(
-                      child: TextField(
-                        controller: _subtaskControllers[index],
-                        decoration: InputDecoration(
-                          labelText: "Subtask ${index + 1}",
-                          border: OutlineInputBorder(),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            // Title
+            Text(
+              'New Task',
+              style: TextStyle(fontSize: 25, color: AppColors.roseBonbon),
+            ),
+            const SizedBox(height: 10),
+
+            // Task Name Field
+            TextField(
+              controller: _taskNameController,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Task Name',
+              ),
+            ),
+            const SizedBox(height: 10),
+
+            // Subtasks
+            if (_subtaskControllers.isNotEmpty)
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: _subtaskControllers.length,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          onPressed: () => _removeSubtaskField(index),
+                          icon: Icon(
+                            Icons.close,
+                            color: AppColors.lavenderFloral,
+                          ),
                         ),
+                        Expanded(
+                          child: TextField(
+                            controller: _subtaskControllers[index],
+                            decoration: InputDecoration(
+                              labelText: "Subtask ${index + 1}",
+                              border: const OutlineInputBorder(),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            const SizedBox(height: 10),
+
+            // Category, Date, Subtask, and Create Buttons
+            Row(
+              children: [
+                // Category Dropdown
+                Expanded(
+                  flex: 4,
+                  child: DropdownButtonFormField<String>(
+                    value: selectedCategory,
+                    hint: const Text('Select Category'),
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 16,
+                        horizontal: 12,
                       ),
                     ),
-                  ],
+                    onChanged: (value) {
+                      if (value == 'New Category') {
+                        _showAddCategoryDialog();
+                      } else {
+                        setState(() {
+                          selectedCategory = value;
+                        });
+                      }
+                    },
+                    items: [
+                      ...categories.map((cat) {
+                        return DropdownMenuItem<String>(
+                          value: cat.id,
+                          child: Text(cat.name),
+                        );
+                      }).toList(),
+                      const DropdownMenuItem<String>(
+                        value: 'New Category',
+                        child: Text('New Category'),
+                      ),
+                    ],
+                  ),
                 ),
-              );
-            },
-          ),
-        Row(
-          children: [
-            Expanded(
-              flex: 3,
-              child: DropdownButtonFormField<String>(
-                value:
-                    selectedCategory, // Automatically selects the first category
-                hint: const Text('Select Category'),
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: AppColors.argentinianBlue),
+                const SizedBox(width: 10),
+
+                // Date Picker Button
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => _selectDate(context),
+                    child: const Icon(Icons.calendar_today),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(
-                      color: AppColors.argentinianBlue,
-                      width: 1.5,
-                    ),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    vertical: 16,
-                    horizontal: 12,
-                  ),
-                  filled: true,
-                  fillColor: AppColors.backgroundLight,
                 ),
-                dropdownColor: AppColors.backgroundLight,
-                iconEnabledColor: AppColors.argentinianBlue,
-                iconDisabledColor: AppColors.textSecondary,
-                onChanged: (value) {
-                  if (value == 'New Category') {
-                    _showAddCategoryDialog();
-                  } else {
-                    setState(() {
-                      selectedCategory = value;
-                    });
-                  }
-                },
-                items: [
-                  ...categories.map((cat) {
-                    return DropdownMenuItem<String>(
-                      value: cat.id,
-                      child: Text(cat.name),
-                    );
-                  }).toList(),
-                  const DropdownMenuItem<String>(
-                    value: 'New Category',
-                    child: Text('New Category'),
+                const SizedBox(width: 10),
+
+                // Add Subtask Button
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => _addSubtaskField(),
+                    child: const Icon(Icons.subject),
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(width: 10),
+
+                // Create Task Button
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      try {
+                        final user = FirebaseAuth.instance.currentUser;
+                        if (user == null)
+                          throw Exception('User not authenticated');
+
+                        // Obtener las subtareas
+                        final subtasks =
+                            _subtaskControllers
+                                .map(
+                                  (controller) => Subtask(
+                                    name: controller.text.trim(),
+                                    completed: false,
+                                  ),
+                                )
+                                .toList();
+
+                        // Asignar categoría predeterminada si no se selecciona ninguna
+                        final categoryId =
+                            (selectedCategory == 'New Category' ||
+                                    selectedCategory == null)
+                                ? 'default' // ID para "No Category"
+                                : selectedCategory!;
+
+                        // Crear la tarea
+                        final newTask = Task(
+                          id: DateTime.now().millisecondsSinceEpoch.toString(),
+                          name: _taskNameController.text.trim(),
+                          date: _selectedDate ?? DateTime.now(),
+                          time: null,
+                          subtasks: subtasks,
+                          categoryId: categoryId,
+                          completed: false,
+                          isSynced: false,
+                          userId: user.uid,
+                        );
+
+                        // Guardar la tarea
+                        await TaskService().addTask(newTask, isPremium);
+
+                        // Notificar al padre que recargue las tareas
+                        Navigator.pop(
+                          context,
+                          true,
+                        ); // Aquí cerramos el modal y devolvemos true
+                      } catch (e) {
+                        print('Error saving task: $e');
+                      }
+                    },
+                    child: const Icon(Icons.check),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: OutlinedButton(
-                onPressed: () => _selectDate(context),
-                child: const Icon(Icons.calendar_today),
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: OutlinedButton(
-                onPressed: () => _addSubtaskField(),
-                child: Icon(Icons.subject),
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: ElevatedButton(
-                onPressed: () async {
-                  try {
-                    final user = FirebaseAuth.instance.currentUser;
-                    if (user == null) throw Exception('User not authenticated');
-
-                    // Get subtasks
-                    final subtasks =
-                        _subtaskControllers
-                            .map(
-                              (controller) => Subtask(
-                                name: controller.text.trim(),
-                                completed: false,
-                              ),
-                            )
-                            .toList();
-
-                    // Assign default category if "New Category" or null
-                    final categoryId =
-                        (selectedCategory == 'New Category' ||
-                                selectedCategory == null)
-                            ? 'default' // ID for "No Category"
-                            : selectedCategory!;
-
-                    // Create the task
-                    final newTask = Task(
-                      id: DateTime.now().millisecondsSinceEpoch.toString(),
-                      name: _taskNameController.text.trim(),
-                      date:
-                          _selectedDate ?? DateTime.now(), // Use selected date
-                      time: null, // Add logic for time if needed
-                      subtasks: subtasks,
-                      categoryId: categoryId,
-                      completed: false,
-                      isSynced: false,
-                      userId: user.uid,
-                    );
-
-                    // Save the task
-                    await TaskService().addTask(newTask, isPremium);
-
-                    // Close the modal and notify the parent to reload tasks
-                    Navigator.pop(context, true);
-                  } catch (e) {
-                    print('Error saving task: $e');
-                  }
-                },
-                child: const Icon(Icons.check),
-              ),
-            ),
+            const SizedBox(height: 30),
           ],
         ),
-        const SizedBox(height: 30),
-      ],
+      ),
     );
   }
 

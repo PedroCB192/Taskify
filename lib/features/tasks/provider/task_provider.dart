@@ -10,13 +10,13 @@ class TaskProvider extends ChangeNotifier {
 
   Future<void> loadTasks() async {
     _tasks = await _taskService.getAllTasks(true);
-    notifyListeners(); // Notify listeners when tasks are loaded
+    notifyListeners(); // Notifica a los widgets que dependen de este estado
   }
 
   Future<void> addTask(Task task) async {
     await _taskService.addTask(task, true);
     _tasks.add(task);
-    notifyListeners(); // Notify listeners when a task is added
+    notifyListeners(); // Notifica a los widgets que dependen de este estado
   }
 
   Future<void> updateTask(Task task) async {
@@ -24,13 +24,13 @@ class TaskProvider extends ChangeNotifier {
     final index = _tasks.indexWhere((t) => t.id == task.id);
     if (index != -1) {
       _tasks[index] = task;
-      notifyListeners(); // Notify listeners when a task is updated
+      notifyListeners(); // Notifica a los widgets que dependen de este estado
     }
   }
 
   Future<void> deleteTask(String taskId) async {
     await _taskService.deleteTask(taskId, true);
     _tasks.removeWhere((task) => task.id == taskId);
-    notifyListeners(); // Notify listeners when a task is deleted
+    notifyListeners(); // Notifica a los widgets que dependen de este estado
   }
 }

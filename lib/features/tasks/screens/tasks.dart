@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:taskify/features/tasks/models/task.dart';
 import 'package:taskify/features/tasks/services/category_service.dart';
-import 'package:taskify/features/tasks/services/task_service.dart';
 import 'package:taskify/features/tasks/widgets/task_widget.dart';
+import 'package:taskify/features/tasks/provider/task_provider.dart';
 
 class Tasks extends StatefulWidget {
   const Tasks({super.key});
@@ -12,72 +13,63 @@ class Tasks extends StatefulWidget {
 }
 
 class _TasksState extends State<Tasks> {
-  final TaskService taskService = TaskService();
   final CategoryService categoryService = CategoryService();
 
-  late Future<List<Task>> _tasksFuture;
+  // Map to track expanded state of tasks
+  final Map<String, bool> _expandedTasks = {};
 
   @override
   void initState() {
     super.initState();
-    _loadTasks(); // Load tasks on initialization
+    Future.microtask(
+      () => Provider.of<TaskProvider>(context, listen: false).loadTasks(),
+    );
   }
 
-  void _loadTasks() {
+  void _toggleTaskExpansion(String taskId) {
     setState(() {
-      _tasksFuture = taskService.getAllTasks(false); // Fetch tasks
+      _expandedTasks[taskId] = !(_expandedTasks[taskId] ?? false);
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final taskProvider = Provider.of<TaskProvider>(context);
+    final tasks = taskProvider.tasks;
+    final now = DateTime.now();
+
+    // Divide tasks into sections
+    final overdueTasks =
+        tasks
+            .where(
+              (task) =>
+                  task.date.isBefore(now) &&
+                  !isSameDay(task.date, now) &&
+                  !task.completed,
+            )
+            .toList();
+    final todayTasks =
+        tasks
+            .where((task) => isSameDay(task.date, now) && !task.completed)
+            .toList();
+    final futureTasks =
+        tasks
+            .where((task) => task.date.isAfter(now) && !task.completed)
+            .toList();
+    final completedTasks = tasks.where((task) => task.completed).toList();
+
     return Scaffold(
-      body: FutureBuilder<List<Task>>(
-        future: _tasksFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No tasks available.'));
-          }
-
-          final tasks = snapshot.data!;
-          final now = DateTime.now();
-
-          // Divide tasks into sections
-          final overdueTasks =
-              tasks
-                  .where(
-                    (task) =>
-                        task.date.isBefore(now) &&
-                        !isSameDay(task.date, now) &&
-                        !task.completed,
-                  )
-                  .toList();
-          final todayTasks =
-              tasks
-                  .where((task) => isSameDay(task.date, now) && !task.completed)
-                  .toList();
-          final futureTasks =
-              tasks
-                  .where((task) => task.date.isAfter(now) && !task.completed)
-                  .toList();
-          final completedTasks = tasks.where((task) => task.completed).toList();
-
-          return ListView(
-            children: [
-              if (overdueTasks.isNotEmpty)
-                _buildSection('Overdue Tasks', overdueTasks),
-              if (todayTasks.isNotEmpty)
-                _buildSection('Today\'s Tasks', todayTasks),
-              if (futureTasks.isNotEmpty)
-                _buildSection('Future Tasks', futureTasks),
-              if (completedTasks.isNotEmpty)
-                _buildSection('Completed Tasks', completedTasks),
-            ],
-          );
-        },
+      body: ListView(
+        children: [
+          if (overdueTasks.isNotEmpty)
+            _buildSection('Overdue Tasks', overdueTasks),
+          if (todayTasks.isNotEmpty)
+            _buildSection('Today\'s Tasks', todayTasks),
+          if (futureTasks.isNotEmpty)
+            _buildSection('Future Tasks', futureTasks),
+          if (completedTasks.isNotEmpty)
+            _buildSection('Completed Tasks', completedTasks),
+        ],
       ),
     );
   }
@@ -110,8 +102,11 @@ class _TasksState extends State<Tasks> {
               return TaskWidget(
                 task: task,
                 categoryColor: categoryColor,
-                onTaskUpdated:
-                    _loadTasks, // Reload tasks when a task is updated
+                isExpanded: _expandedTasks[task.id] ?? false,
+                onExpansionChanged: () => _toggleTaskExpansion(task.id),
+                onTaskUpdated: () {
+                  Provider.of<TaskProvider>(context, listen: false).loadTasks();
+                },
               );
             },
           );

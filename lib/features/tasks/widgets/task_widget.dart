@@ -1,17 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // Import the intl package
+import 'package:provider/provider.dart';
 import 'package:taskify/features/tasks/models/task.dart';
 import 'package:taskify/features/tasks/widgets/subtask_widget.dart';
+import 'package:taskify/features/tasks/provider/task_provider.dart';
 
 class TaskWidget extends StatefulWidget {
   final Task task;
   final Color categoryColor;
+  final bool isExpanded;
+  final VoidCallback onExpansionChanged;
+  final VoidCallback onTaskUpdated;
 
   const TaskWidget({
     super.key,
     required this.task,
     required this.categoryColor,
-    required void Function() onTaskUpdated,
+    required this.isExpanded,
+    required this.onExpansionChanged,
+    required this.onTaskUpdated,
   });
 
   @override
@@ -19,8 +26,6 @@ class TaskWidget extends StatefulWidget {
 }
 
 class _TaskWidgetState extends State<TaskWidget> {
-  bool _isExpanded = false; // Controls whether subtasks are shown
-
   @override
   Widget build(BuildContext context) {
     final taskColor =
@@ -44,9 +49,14 @@ class _TaskWidgetState extends State<TaskWidget> {
             leading: GestureDetector(
               onTap: () {
                 // Toggle task completion
-                setState(() {
-                  widget.task.completed = !widget.task.completed;
-                });
+                final updatedTask = widget.task.copyWith(
+                  completed: !widget.task.completed,
+                );
+                Provider.of<TaskProvider>(
+                  context,
+                  listen: false,
+                ).updateTask(updatedTask);
+                widget.onTaskUpdated();
               },
               child: Container(
                 width: 24,
@@ -79,9 +89,8 @@ class _TaskWidgetState extends State<TaskWidget> {
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(
-                  height: 4,
-                ), // Add spacing between title and subtitle
+                const SizedBox(height: 4),
+                // Add spacing between title and subtitle
                 Text(
                   'Due: $formattedDate', // Use the formatted date
                   style: const TextStyle(color: Colors.grey),
@@ -89,15 +98,13 @@ class _TaskWidgetState extends State<TaskWidget> {
               ],
             ),
             trailing: IconButton(
-              icon: Icon(_isExpanded ? Icons.expand_less : Icons.expand_more),
-              onPressed: () {
-                setState(() {
-                  _isExpanded = !_isExpanded;
-                });
-              },
+              icon: Icon(
+                widget.isExpanded ? Icons.expand_less : Icons.expand_more,
+              ),
+              onPressed: widget.onExpansionChanged,
             ),
           ),
-          if (_isExpanded && widget.task.subtasks != null)
+          if (widget.isExpanded && widget.task.subtasks != null)
             Padding(
               padding: const EdgeInsets.only(
                 left: 16.0,
@@ -106,9 +113,27 @@ class _TaskWidgetState extends State<TaskWidget> {
               ),
               child: Column(
                 children:
-                    widget.task.subtasks!
-                        .map((subtask) => SubtaskWidget(subtask: subtask))
-                        .toList(),
+                    widget.task.subtasks!.map((subtask) {
+                      return SubtaskWidget(
+                        subtask: subtask,
+                        onSubtaskToggled: () {
+                          setState(() {
+                            subtask.completed = !subtask.completed;
+                          });
+
+                          // Update the task in the provider
+                          final updatedTask = widget.task.copyWith(
+                            subtasks: widget.task.subtasks,
+                          );
+                          Provider.of<TaskProvider>(
+                            context,
+                            listen: false,
+                          ).updateTask(updatedTask);
+
+                          widget.onTaskUpdated();
+                        },
+                      );
+                    }).toList(),
               ),
             ),
         ],

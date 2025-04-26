@@ -100,8 +100,8 @@ class _MainLayoutState extends State<MainLayout> {
       ),
       body: _screens[_currentIndex],
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showModalBottomSheet(
+        onPressed: () async {
+          final shouldReload = await showModalBottomSheet<bool>(
             context: context,
             isScrollControlled: true,
             backgroundColor: Colors.transparent,
@@ -120,19 +120,16 @@ class _MainLayoutState extends State<MainLayout> {
                   constraints: BoxConstraints(
                     maxHeight: MediaQuery.of(context).size.height * 0.9,
                   ),
-                  child: SingleChildScrollView(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 16,
-                      ),
-                      child: TasksCreateModal(),
-                    ),
-                  ),
+                  child: const TasksCreateModal(),
                 ),
               );
             },
           );
+
+          // Recargar las tareas si se creó una nueva
+          if (shouldReload == true) {
+            Provider.of<TaskProvider>(context, listen: false).loadTasks();
+          }
         },
         child: const Icon(Icons.add),
       ),
@@ -172,7 +169,7 @@ class _MainLayoutState extends State<MainLayout> {
       case 2:
         return 'Calendar';
       case 3:
-        return 'P';
+        return 'Profile';
       default:
         return 'Taskify';
     }

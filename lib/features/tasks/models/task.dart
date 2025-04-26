@@ -45,6 +45,31 @@ class Task {
     required this.userId,
   });
 
+  // Add the copyWith method here
+  Task copyWith({
+    String? id,
+    String? name,
+    DateTime? date,
+    TimeOfDay? time,
+    List<Subtask>? subtasks,
+    String? categoryId,
+    bool? completed,
+    bool? isSynced,
+    String? userId,
+  }) {
+    return Task(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      date: date ?? this.date,
+      time: time ?? this.time,
+      subtasks: subtasks ?? this.subtasks,
+      categoryId: categoryId ?? this.categoryId,
+      completed: completed ?? this.completed,
+      isSynced: isSynced ?? this.isSynced,
+      userId: userId ?? this.userId,
+    );
+  }
+
   // Method to convert the model to a map for Firestore
   Map<String, dynamic> toFirestore() {
     return {
