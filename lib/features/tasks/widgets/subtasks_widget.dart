@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:taskify/features/tasks/models/subtask.dart';
 import 'package:audioplayers/audioplayers.dart';
 
-class SubtaskWidget extends StatelessWidget {
+class SubtasksWidget extends StatelessWidget {
   final Subtask subtask;
   final VoidCallback onSubtaskToggled;
 
-  const SubtaskWidget({
+  const SubtasksWidget({
     super.key,
     required this.subtask,
     required this.onSubtaskToggled,

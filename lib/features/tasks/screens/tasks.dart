@@ -150,7 +150,7 @@ class _TasksState extends State<Tasks> {
                     ).deleteTask(task.id);
                   }
                 },
-                child: TaskWidget(
+                child: TasksWidget(
                   task: task,
                   categoryColor: categoryColor,
                   isExpanded: _expandedTasks[task.id] ?? false,

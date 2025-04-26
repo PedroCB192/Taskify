@@ -7,14 +7,14 @@ import 'package:taskify/features/tasks/provider/task_provider.dart';
 import 'package:taskify/features/tasks/widgets/tasks_edit_modal.dart';
 import 'package:audioplayers/audioplayers.dart';
 
-class TaskWidget extends StatefulWidget {
+class TasksWidget extends StatefulWidget {
   final Task task;
   final Color categoryColor;
   final bool isExpanded;
   final VoidCallback onExpansionChanged;
   final VoidCallback onTaskUpdated;
 
-  const TaskWidget({
+  const TasksWidget({
     super.key,
     required this.task,
     required this.categoryColor,
@@ -25,10 +25,10 @@ class TaskWidget extends StatefulWidget {
   });
 
   @override
-  State<TaskWidget> createState() => _TaskWidgetState();
+  State<TasksWidget> createState() => _TasksWidgetState();
 }
 
-class _TaskWidgetState extends State<TaskWidget> {
+class _TasksWidgetState extends State<TasksWidget> {
   @override
   Widget build(BuildContext context) {
     final taskColor =
@@ -143,7 +143,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                 child: Column(
                   children:
                       widget.task.subtasks!.map((subtask) {
-                        return SubtaskWidget(
+                        return SubtasksWidget(
                           subtask: subtask,
                           onSubtaskToggled: () {
                             setState(() {
