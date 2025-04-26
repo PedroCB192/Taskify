@@ -99,14 +99,50 @@ class _TasksState extends State<Tasks> {
                       ? Color(category.color) // Convert ARGB int to Color
                       : Colors.grey; // Default color if category not found
 
-              return TaskWidget(
-                task: task,
-                categoryColor: categoryColor,
-                isExpanded: _expandedTasks[task.id] ?? false,
-                onExpansionChanged: () => _toggleTaskExpansion(task.id),
-                onTaskUpdated: () {
-                  Provider.of<TaskProvider>(context, listen: false).loadTasks();
+              return Dismissible(
+                key: Key(task.id), // Unique key for each task
+                direction:
+                    DismissDirection.horizontal, // Allow horizontal swipe
+                background: Container(
+                  color: Colors.green,
+                  alignment: Alignment.centerLeft,
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: const Icon(Icons.check, color: Colors.white),
+                ),
+                secondaryBackground: Container(
+                  color: Colors.red,
+                  alignment: Alignment.centerRight,
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: const Icon(Icons.delete, color: Colors.white),
+                ),
+                onDismissed: (direction) {
+                  if (direction == DismissDirection.startToEnd) {
+                    // Mark task as completed
+                    final updatedTask = task.copyWith(completed: true);
+                    Provider.of<TaskProvider>(
+                      context,
+                      listen: false,
+                    ).updateTask(updatedTask);
+                  } else if (direction == DismissDirection.endToStart) {
+                    // Delete the task
+                    Provider.of<TaskProvider>(
+                      context,
+                      listen: false,
+                    ).deleteTask(task.id);
+                  }
                 },
+                child: TaskWidget(
+                  task: task,
+                  categoryColor: categoryColor,
+                  isExpanded: _expandedTasks[task.id] ?? false,
+                  onExpansionChanged: () => _toggleTaskExpansion(task.id),
+                  onTaskUpdated: () {
+                    Provider.of<TaskProvider>(
+                      context,
+                      listen: false,
+                    ).loadTasks();
+                  },
+                ),
               );
             },
           );

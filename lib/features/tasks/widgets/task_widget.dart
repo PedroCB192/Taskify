@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:taskify/features/tasks/models/task.dart';
 import 'package:taskify/features/tasks/widgets/subtask_widget.dart';
 import 'package:taskify/features/tasks/provider/task_provider.dart';
+import 'package:taskify/features/tasks/widgets/task_edit_modal.dart';
 
 class TaskWidget extends StatefulWidget {
   final Task task;
@@ -43,100 +44,114 @@ class _TaskWidgetState extends State<TaskWidget> {
         ),
         borderRadius: BorderRadius.circular(8.0), // Rounded corners
       ),
-      child: Column(
-        children: [
-          ListTile(
-            leading: GestureDetector(
-              onTap: () {
-                // Toggle task completion
-                final updatedTask = widget.task.copyWith(
-                  completed: !widget.task.completed,
-                );
-                Provider.of<TaskProvider>(
-                  context,
-                  listen: false,
-                ).updateTask(updatedTask);
-                widget.onTaskUpdated();
-              },
-              child: Container(
-                width: 24,
-                height: 24,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color:
-                        widget.task.completed
-                            ? Colors.grey
-                            : widget.categoryColor,
-                    width: 2,
+      child: GestureDetector(
+        onTap: () {
+          // Abrir el modal de edición al presionar cualquier parte de la tarea
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            builder: (context) => TaskEditModal(task: widget.task),
+          );
+        },
+        child: Column(
+          children: [
+            ListTile(
+              leading: GestureDetector(
+                onTap: () {
+                  // Toggle task completion
+                  final updatedTask = widget.task.copyWith(
+                    completed: !widget.task.completed,
+                  );
+                  Provider.of<TaskProvider>(
+                    context,
+                    listen: false,
+                  ).updateTask(updatedTask);
+                  widget.onTaskUpdated();
+                },
+                child: Container(
+                  width: 24,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color:
+                          widget.task.completed
+                              ? Colors.grey
+                              : widget.categoryColor,
+                      width: 2,
+                    ),
                   ),
+                  child:
+                      widget.task.completed
+                          ? const Icon(
+                            Icons.check,
+                            color: Colors.grey,
+                            size: 16,
+                          )
+                          : null,
                 ),
-                child:
-                    widget.task.completed
-                        ? const Icon(Icons.check, color: Colors.grey, size: 16)
-                        : null,
               ),
-            ),
-            title: Text(
-              widget.task.name,
-              style: TextStyle(
-                decoration:
-                    widget.task.completed
-                        ? TextDecoration.lineThrough
-                        : TextDecoration.none,
-              ),
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 4),
-                // Add spacing between title and subtitle
-                Text(
-                  'Due: $formattedDate', // Use the formatted date
-                  style: const TextStyle(color: Colors.grey),
+              title: Text(
+                widget.task.name,
+                style: TextStyle(
+                  decoration:
+                      widget.task.completed
+                          ? TextDecoration.lineThrough
+                          : TextDecoration.none,
                 ),
-              ],
-            ),
-            trailing: IconButton(
-              icon: Icon(
-                widget.isExpanded ? Icons.expand_less : Icons.expand_more,
               ),
-              onPressed: widget.onExpansionChanged,
-            ),
-          ),
-          if (widget.isExpanded && widget.task.subtasks != null)
-            Padding(
-              padding: const EdgeInsets.only(
-                left: 16.0,
-                right: 16.0,
-                bottom: 8.0,
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 4),
+                  // Add spacing between title and subtitle
+                  Text(
+                    'Due: $formattedDate', // Use the formatted date
+                    style: const TextStyle(color: Colors.grey),
+                  ),
+                ],
               ),
-              child: Column(
-                children:
-                    widget.task.subtasks!.map((subtask) {
-                      return SubtaskWidget(
-                        subtask: subtask,
-                        onSubtaskToggled: () {
-                          setState(() {
-                            subtask.completed = !subtask.completed;
-                          });
+              trailing: IconButton(
+                icon: Icon(
+                  widget.isExpanded ? Icons.expand_less : Icons.expand_more,
+                ),
+                onPressed: widget.onExpansionChanged,
+              ),
+            ),
+            if (widget.isExpanded && widget.task.subtasks != null)
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: 16.0,
+                  right: 16.0,
+                  bottom: 8.0,
+                ),
+                child: Column(
+                  children:
+                      widget.task.subtasks!.map((subtask) {
+                        return SubtaskWidget(
+                          subtask: subtask,
+                          onSubtaskToggled: () {
+                            setState(() {
+                              subtask.completed = !subtask.completed;
+                            });
 
-                          // Update the task in the provider
-                          final updatedTask = widget.task.copyWith(
-                            subtasks: widget.task.subtasks,
-                          );
-                          Provider.of<TaskProvider>(
-                            context,
-                            listen: false,
-                          ).updateTask(updatedTask);
+                            // Update the task in the provider
+                            final updatedTask = widget.task.copyWith(
+                              subtasks: widget.task.subtasks,
+                            );
+                            Provider.of<TaskProvider>(
+                              context,
+                              listen: false,
+                            ).updateTask(updatedTask);
 
-                          widget.onTaskUpdated();
-                        },
-                      );
-                    }).toList(),
+                            widget.onTaskUpdated();
+                          },
+                        );
+                      }).toList(),
+                ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }

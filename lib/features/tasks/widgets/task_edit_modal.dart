@@ -1,58 +1,62 @@
 import 'package:flutter/material.dart';
 import 'package:taskify/core/constants/app_colors.dart';
 import 'package:taskify/core/constants/default_colors.dart';
-import 'package:taskify/features/tasks/services/category_service.dart';
-import 'package:taskify/features/tasks/models/category.dart';
 import 'package:taskify/features/tasks/models/task.dart';
 import 'package:taskify/features/tasks/models/subtask.dart';
-import 'package:taskify/features/tasks/services/task_service.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:taskify/features/tasks/models/category.dart';
+import 'package:taskify/features/tasks/services/category_service.dart';
+import 'package:provider/provider.dart';
+import 'package:taskify/features/tasks/provider/task_provider.dart';
 
-class TasksCreateModal extends StatefulWidget {
-  const TasksCreateModal({super.key});
+class TaskEditModal extends StatefulWidget {
+  final Task task; // Recibe la tarea como parámetro
+
+  const TaskEditModal({super.key, required this.task});
 
   @override
-  State<TasksCreateModal> createState() => _TasksCreateModalState();
+  State<TaskEditModal> createState() => _TaskEditModalState();
 }
 
-class _TasksCreateModalState extends State<TasksCreateModal> {
-  final List<TextEditingController> _subtaskControllers = [];
-  List<Category> categories = [];
-  String? selectedCategory;
-  final TextEditingController categoryController = TextEditingController();
-  DateTime? _selectedDate; // Nullable to handle no selection
-  final TextEditingController _taskNameController = TextEditingController();
+class _TaskEditModalState extends State<TaskEditModal> {
+  late TextEditingController _taskNameController;
+  late DateTime _selectedDate;
+  late List<TextEditingController> _subtaskControllers;
+
+  final List<Category> _categories = [];
+  String? _selectedCategory;
+  final TextEditingController _categoryController = TextEditingController();
   final CategoryService _categoryService = CategoryService();
-  final bool isPremium = true; // Change based on your app's logic
-  Color selectedColor = DefaultColors.availableColors.first; // Default color
+  final bool _isPremium = true; // Cambia esto según la lógica de tu app
+  Color _selectedColor = DefaultColors.availableColors.first;
 
   @override
   void initState() {
     super.initState();
-    _selectedDate = DateTime.now(); // Default to current date
-    _loadCategories(); // Load categories on initialization
+    // Inicializar los controladores con los datos de la tarea
+    _taskNameController = TextEditingController(text: widget.task.name);
+    _selectedDate = widget.task.date;
+    _subtaskControllers =
+        widget.task.subtasks != null
+            ? widget.task.subtasks!
+                .map((subtask) => TextEditingController(text: subtask.name))
+                .toList()
+            : [];
+    _selectedCategory = widget.task.categoryId;
+    _loadCategories();
   }
 
   Future<void> _loadCategories() async {
     try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) throw Exception('User not authenticated');
-
       final loadedCategories = await _categoryService.getAllCategories(
-        isPremium,
+        _isPremium,
       );
 
       setState(() {
-        // Ensure "No Category" is the first category
-        categories =
-            loadedCategories..sort((a, b) {
-              if (a.name == 'No Category') return -1;
-              if (b.name == 'No Category') return 1;
-              return 0;
-            });
-
-        // Automatically select the first category
-        selectedCategory = categories.isNotEmpty ? categories.first.id : null;
+        _categories.addAll(loadedCategories);
+        if (!_categories.any((cat) => cat.id == _selectedCategory)) {
+          _selectedCategory =
+              _categories.isNotEmpty ? _categories.first.id : null;
+        }
       });
     } catch (e) {
       print('Error loading categories: $e');
@@ -62,7 +66,7 @@ class _TasksCreateModalState extends State<TasksCreateModal> {
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: _selectedDate ?? DateTime.now(),
+      initialDate: _selectedDate,
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
     );
@@ -86,7 +90,7 @@ class _TasksCreateModalState extends State<TasksCreateModal> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     TextField(
-                      controller: categoryController,
+                      controller: _categoryController,
                       decoration: const InputDecoration(
                         label: Text("Enter category name"),
                       ),
@@ -102,7 +106,7 @@ class _TasksCreateModalState extends State<TasksCreateModal> {
                             return GestureDetector(
                               onTap: () {
                                 setState(() {
-                                  selectedColor = color;
+                                  _selectedColor = color;
                                 });
                               },
                               child: Container(
@@ -113,7 +117,7 @@ class _TasksCreateModalState extends State<TasksCreateModal> {
                                   borderRadius: BorderRadius.circular(8),
                                   border: Border.all(
                                     color:
-                                        selectedColor == color
+                                        _selectedColor == color
                                             ? Colors.black
                                             : Colors.transparent,
                                     width: 2,
@@ -132,49 +136,35 @@ class _TasksCreateModalState extends State<TasksCreateModal> {
                   ),
                   ElevatedButton(
                     onPressed: () async {
-                      final newCategoryName = categoryController.text.trim();
+                      final newCategoryName = _categoryController.text.trim();
                       if (newCategoryName.isNotEmpty &&
-                          !categories.any(
+                          !_categories.any(
                             (cat) => cat.name == newCategoryName,
                           )) {
                         try {
-                          final user = FirebaseAuth.instance.currentUser;
-                          if (user == null)
-                            throw Exception('User not authenticated');
-
                           final newCategory = Category(
                             id:
                                 DateTime.now().millisecondsSinceEpoch
                                     .toString(),
                             name: newCategoryName,
-                            userId: user.uid,
-                            color:
-                                selectedColor.value, // Save color as ARGB int
+                            userId: widget.task.userId,
+                            color: _selectedColor.value,
                           );
 
                           await _categoryService.addCategory(
                             newCategory,
-                            isPremium,
+                            _isPremium,
                           );
 
-                          // Actualizar la lista de categorías y seleccionar la nueva
                           setState(() {
-                            categories.add(newCategory); // Add to local list
-                            selectedCategory =
-                                newCategory.id; // Select new category
+                            _categories.add(newCategory);
+                            _selectedCategory = newCategory.id;
                           });
-
-                          // Actualizar el estado principal para reflejar los cambios
-                          if (mounted) {
-                            this.setState(() {
-                              selectedCategory = newCategory.id;
-                            });
-                          }
                         } catch (e) {
                           print('Error adding category: $e');
                         }
                       }
-                      categoryController.clear();
+                      _categoryController.clear();
                       Navigator.pop(context);
                     },
                     child: const Text('Add'),
@@ -188,14 +178,11 @@ class _TasksCreateModalState extends State<TasksCreateModal> {
 
   @override
   void dispose() {
-    // Liberar los controladores de subtareas
+    _taskNameController.dispose();
+    _categoryController.dispose();
     for (var controller in _subtaskControllers) {
       controller.dispose();
     }
-    // Liberar el controlador de categoría si se usa
-    categoryController.dispose();
-    // Liberar el controlador del nombre de la tarea
-    _taskNameController.dispose();
     super.dispose();
   }
 
@@ -211,15 +198,13 @@ class _TasksCreateModalState extends State<TasksCreateModal> {
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             // Title
             Text(
-              'New Task',
+              'Edit Task',
               style: TextStyle(fontSize: 25, color: AppColors.roseBonbon),
             ),
             const SizedBox(height: 10),
-
             // Task Name Field
             TextField(
               controller: _taskNameController,
@@ -229,7 +214,6 @@ class _TasksCreateModalState extends State<TasksCreateModal> {
               ),
             ),
             const SizedBox(height: 10),
-
             // Subtasks
             if (_subtaskControllers.isNotEmpty)
               ListView.builder(
@@ -243,7 +227,7 @@ class _TasksCreateModalState extends State<TasksCreateModal> {
                       children: [
                         IconButton(
                           onPressed: () => _removeSubtaskField(index),
-                          icon: Icon(
+                          icon: const Icon(
                             Icons.close,
                             color: AppColors.lavenderFloral,
                           ),
@@ -262,15 +246,16 @@ class _TasksCreateModalState extends State<TasksCreateModal> {
                   );
                 },
               ),
-            const SizedBox(height: 10),
-            // Category, Date, Subtask, and Create Buttons
             Row(
               children: [
-                // Category Dropdown
                 Expanded(
                   flex: 4,
-                  child: DropdownButtonFormField<String>(
-                    value: selectedCategory,
+                  child: // Category Selector
+                      DropdownButtonFormField<String>(
+                    value:
+                        _categories.any((cat) => cat.id == _selectedCategory)
+                            ? _selectedCategory
+                            : null, // Aseguramos que la categoría seleccionada sea válida
                     hint: const Text('Select Category'),
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
@@ -286,12 +271,12 @@ class _TasksCreateModalState extends State<TasksCreateModal> {
                         _showAddCategoryDialog();
                       } else {
                         setState(() {
-                          selectedCategory = value;
+                          _selectedCategory = value;
                         });
                       }
                     },
                     items: [
-                      ...categories.map((cat) {
+                      ..._categories.map((cat) {
                         return DropdownMenuItem<String>(
                           value: cat.id,
                           child: Text(cat.name),
@@ -304,8 +289,7 @@ class _TasksCreateModalState extends State<TasksCreateModal> {
                     ],
                   ),
                 ),
-                const SizedBox(width: 10),
-
+                SizedBox(width: 10),
                 // Date Picker Button
                 Expanded(
                   child: OutlinedButton(
@@ -314,67 +298,84 @@ class _TasksCreateModalState extends State<TasksCreateModal> {
                   ),
                 ),
                 const SizedBox(width: 10),
-
                 // Add Subtask Button
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: () => _addSubtaskField(),
-                    child: const Icon(Icons.subject),
+                    onPressed: _addSubtaskField,
+                    child: const Icon(
+                      Icons.subject,
+                      color: AppColors.lavenderFloral,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                // Cancel Button
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Lógica para cerrar el modal sin guardar cambios
+                      Navigator.pop(context);
+                    },
+                    child: const Icon(Icons.cancel),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.lavenderFloral,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 10),
 
-                // Create Task Button
+                // Delete Button
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () async {
-                      try {
-                        final user = FirebaseAuth.instance.currentUser;
-                        if (user == null)
-                          throw Exception('User not authenticated');
+                    onPressed: () {
+                      // Lógica para eliminar la tarea
+                      Provider.of<TaskProvider>(
+                        context,
+                        listen: false,
+                      ).deleteTask(widget.task.id);
 
-                        // Obtener las subtareas
-                        final subtasks =
-                            _subtaskControllers
-                                .map(
-                                  (controller) => Subtask(
-                                    name: controller.text.trim(),
-                                    completed: false,
-                                  ),
-                                )
-                                .toList();
+                      // Cerrar el modal después de eliminar
+                      Navigator.pop(context);
+                    },
+                    child: const Icon(Icons.delete),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.lavenderFloral,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
 
-                        // Asignar categoría predeterminada si no se selecciona ninguna
-                        final categoryId =
-                            (selectedCategory == 'New Category' ||
-                                    selectedCategory == null)
-                                ? 'default' // ID para "No Category"
-                                : selectedCategory!;
+                // Save Button
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      final updatedSubtasks =
+                          _subtaskControllers
+                              .map(
+                                (controller) => Subtask(
+                                  name: controller.text.trim(),
+                                  completed: false,
+                                ),
+                              )
+                              .toList();
 
-                        // Crear la tarea
-                        final newTask = Task(
-                          id: DateTime.now().millisecondsSinceEpoch.toString(),
-                          name: _taskNameController.text.trim(),
-                          date: _selectedDate ?? DateTime.now(),
-                          time: null,
-                          subtasks: subtasks,
-                          categoryId: categoryId,
-                          completed: false,
-                          isSynced: false,
-                          userId: user.uid,
-                        );
+                      final updatedTask = widget.task.copyWith(
+                        name: _taskNameController.text.trim(),
+                        date: _selectedDate,
+                        subtasks: updatedSubtasks,
+                        categoryId: _selectedCategory,
+                      );
 
-                        // Guardar la tarea
-                        await TaskService().addTask(newTask, isPremium);
+                      Provider.of<TaskProvider>(
+                        context,
+                        listen: false,
+                      ).updateTask(updatedTask);
 
-                        // Notificar al padre que recargue las tareas
-                        Navigator.pop(
-                          context,
-                          true,
-                        ); // Aquí cerramos el modal y devolvemos true
-                      } catch (e) {
-                        print('Error saving task: $e');
-                      }
+                      Navigator.pop(context);
                     },
                     child: const Icon(Icons.check),
                   ),
