@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:taskify/core/constants/app_colors.dart';
 import 'package:taskify/core/constants/default_colors.dart';
-import 'package:taskify/features/tasks/services/category_service.dart';
-import 'package:taskify/features/tasks/models/category.dart';
+import 'package:taskify/features/categories/services/category_service.dart';
+import 'package:taskify/features/categories/models/category.dart';
 import 'package:taskify/features/tasks/models/task.dart';
 import 'package:taskify/features/tasks/models/subtask.dart';
 import 'package:taskify/features/tasks/services/task_service.dart';

@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:taskify/features/tasks/models/task.dart';
-import 'package:taskify/features/tasks/services/category_service.dart';
+import 'package:taskify/features/categories/services/category_service.dart';
 import 'package:taskify/features/tasks/widgets/tasks_edit_modal.dart';
 import 'package:taskify/features/tasks/widgets/tasks_widget.dart';
 import 'package:taskify/features/tasks/provider/task_provider.dart';
 import 'package:audioplayers/audioplayers.dart';
 
-class Tasks extends StatefulWidget {
-  const Tasks({super.key});
+class TasksScreen extends StatefulWidget {
+  const TasksScreen({super.key});
 
   @override
-  State<Tasks> createState() => _TasksState();
+  State<TasksScreen> createState() => _TasksScreenState();
 }
 
-class _TasksState extends State<Tasks> {
+class _TasksScreenState extends State<TasksScreen> {
   final CategoryService categoryService = CategoryService();
 
   // Map to track expanded state of tasks
@@ -66,11 +66,11 @@ class _TasksState extends State<Tasks> {
           if (overdueTasks.isNotEmpty)
             _buildSection('Overdue Tasks', overdueTasks),
           if (todayTasks.isNotEmpty)
-            _buildSection('Today\'s Tasks', todayTasks),
+            _buildSection('Today\'s TasksScreen', todayTasks),
           if (futureTasks.isNotEmpty)
-            _buildSection('Future Tasks', futureTasks),
+            _buildSection('Future TasksScreen', futureTasks),
           if (completedTasks.isNotEmpty)
-            _buildSection('Completed Tasks', completedTasks),
+            _buildSection('Completed TasksScreen', completedTasks),
         ],
       ),
     );

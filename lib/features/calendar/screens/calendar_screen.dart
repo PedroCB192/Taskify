@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class Categories extends StatelessWidget {
-  const Categories({super.key});
+class CalendarScreen extends StatelessWidget {
+  const CalendarScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -11,7 +11,7 @@ class Categories extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Text(
-              'Categories',
+              'CalendarScreen',
               style: TextStyle(
                 fontSize: 36,
                 fontWeight: FontWeight.bold,
@@ -19,7 +19,7 @@ class Categories extends StatelessWidget {
               ),
             ),
           ],
-        )
+        ),
       ),
     );
   }
