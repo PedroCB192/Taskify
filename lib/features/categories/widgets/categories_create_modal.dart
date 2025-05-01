@@ -48,7 +48,7 @@ class _CategoriesCreateModalState extends State<CategoriesCreateModal> {
         color: _selectedColor.value, // Save color as ARGB int
       );
 
-      await _categoryService.addCategory(newCategory, true);
+      await _categoryService.addCategory(newCategory);
 
       Navigator.pop(context, true); // Close modal and notify success
     } catch (e) {

@@ -26,7 +26,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   Future<void> _loadData() async {
     try {
       // Cargar categorías
-      final categories = await _categoryService.getAllCategories(true);
+      final categories = await _categoryService.getAllCategories();
 
       // Obtener tareas desde el TaskProvider
       final tasks = Provider.of<TaskProvider>(context, listen: false).tasks;
