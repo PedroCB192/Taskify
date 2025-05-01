@@ -9,18 +9,18 @@ class TaskProvider extends ChangeNotifier {
   List<Task> get tasks => _tasks;
 
   Future<void> loadTasks() async {
-    _tasks = await _taskService.getAllTasks(true);
+    _tasks = await _taskService.getAllTasks();
     notifyListeners(); // Notifica a los widgets que dependen de este estado
   }
 
   Future<void> addTask(Task task) async {
-    await _taskService.addTask(task, true);
+    await _taskService.addTask(task);
     _tasks.add(task);
     notifyListeners(); // Notifica a los widgets que dependen de este estado
   }
 
   Future<void> updateTask(Task task) async {
-    await _taskService.updateTask(task, true);
+    await _taskService.updateTask(task);
     final index = _tasks.indexWhere((t) => t.id == task.id);
     if (index != -1) {
       _tasks[index] = task;
@@ -29,7 +29,7 @@ class TaskProvider extends ChangeNotifier {
   }
 
   Future<void> deleteTask(String taskId) async {
-    await _taskService.deleteTask(taskId, true);
+    await _taskService.deleteTask(taskId);
     _tasks.removeWhere((task) => task.id == taskId);
     notifyListeners(); // Notifica a los widgets que dependen de este estado
   }
@@ -41,7 +41,7 @@ class TaskProvider extends ChangeNotifier {
 
     // Eliminar cada tarea individualmente
     for (final task in tasksToDelete) {
-      await _taskService.deleteTask(task.id, true);
+      await _taskService.deleteTask(task.id);
       _tasks.removeWhere((t) => t.id == task.id);
     }
 

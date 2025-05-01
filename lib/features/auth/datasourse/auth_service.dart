@@ -73,10 +73,7 @@ class AuthService {
           userId: user.uid,
           color: Colors.black.value, // Default color (black)
         );
-        await _categoryService.addCategory(
-          defaultCategory,
-          false,
-        ); // Not premium
+        await _categoryService.addCategory(defaultCategory); // Not premium
       }
 
       return user;

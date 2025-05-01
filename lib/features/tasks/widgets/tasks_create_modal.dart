@@ -24,7 +24,6 @@ class _TasksCreateModalState extends State<TasksCreateModal> {
   DateTime? _selectedDate; // Nullable to handle no selection
   final TextEditingController _taskNameController = TextEditingController();
   final CategoryService _categoryService = CategoryService();
-  final bool isPremium = true; // Change based on your app's logic
   Color selectedColor = DefaultColors.availableColors.first; // Default color
 
   @override
@@ -39,9 +38,7 @@ class _TasksCreateModalState extends State<TasksCreateModal> {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) throw Exception('User not authenticated');
 
-      final loadedCategories = await _categoryService.getAllCategories(
-        isPremium,
-      );
+      final loadedCategories = await _categoryService.getAllCategories();
 
       setState(() {
         // Ensure "No Category" is the first category
@@ -153,10 +150,7 @@ class _TasksCreateModalState extends State<TasksCreateModal> {
                                 selectedColor.value, // Save color as ARGB int
                           );
 
-                          await _categoryService.addCategory(
-                            newCategory,
-                            isPremium,
-                          );
+                          await _categoryService.addCategory(newCategory);
 
                           // Update the list of categories and select the new one
                           setState(() {
@@ -365,7 +359,7 @@ class _TasksCreateModalState extends State<TasksCreateModal> {
                         );
 
                         // Guardar la tarea
-                        await TaskService().addTask(newTask, isPremium);
+                        await TaskService().addTask(newTask);
 
                         // Notificar el cambio
                         Navigator.pop(

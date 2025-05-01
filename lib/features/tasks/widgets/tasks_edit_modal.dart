@@ -22,12 +22,10 @@ class _TaskEditModalState extends State<TasksEditModal> {
   late TextEditingController _taskNameController;
   late DateTime _selectedDate;
   late List<TextEditingController> _subtaskControllers;
-
   final List<Category> _categories = [];
   String? _selectedCategory;
   final TextEditingController _categoryController = TextEditingController();
   final CategoryService _categoryService = CategoryService();
-  final bool _isPremium = true; // Cambia esto según la lógica de tu app
   Color _selectedColor = DefaultColors.availableColors.first;
 
   @override
@@ -48,9 +46,7 @@ class _TaskEditModalState extends State<TasksEditModal> {
 
   Future<void> _loadCategories() async {
     try {
-      final loadedCategories = await _categoryService.getAllCategories(
-        _isPremium,
-      );
+      final loadedCategories = await _categoryService.getAllCategories();
 
       setState(() {
         _categories.addAll(loadedCategories);
@@ -152,10 +148,7 @@ class _TaskEditModalState extends State<TasksEditModal> {
                             color: _selectedColor.value,
                           );
 
-                          await _categoryService.addCategory(
-                            newCategory,
-                            _isPremium,
-                          );
+                          await _categoryService.addCategory(newCategory);
 
                           setState(() {
                             _categories.add(newCategory);

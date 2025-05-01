@@ -54,7 +54,7 @@ class _CategoriesEditModalState extends State<CategoriesEditModal> {
         color: _selectedColor.value, // Guardar el color como ARGB int
       );
 
-      await _categoryService.updateCategory(updatedCategory, true);
+      await _categoryService.updateCategory(updatedCategory);
 
       Navigator.pop(context, true); // Cerrar el modal y notificar éxito
     } catch (e) {
@@ -186,7 +186,6 @@ class _CategoriesEditModalState extends State<CategoriesEditModal> {
                           // Eliminar la categoría
                           await _categoryService.deleteCategory(
                             widget.category.id,
-                            true,
                           );
 
                           Navigator.pop(
