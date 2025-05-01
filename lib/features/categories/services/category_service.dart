@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hive/hive.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:taskify/features/tasks/models/category.dart';
+import 'package:taskify/features/categories/models/category.dart';
 
 class CategoryService {
   final Box<Category> _categoryBox = Hive.box<Category>('categories');
@@ -157,6 +157,25 @@ class CategoryService {
     // Delete from Firebase if the user is premium
     if (isPremium) {
       await _firestore.collection('categories').doc(id).delete();
+    }
+  }
+
+  // Retrieve category details by its ID
+  Future<Map<String, dynamic>?> getCategoryDetailsById(
+    String categoryId,
+  ) async {
+    try {
+      // Obtener la categoría desde Firestore o Hive
+      final category = await getCategoryById(categoryId);
+      if (category == null) return null;
+
+      return {
+        'name': category.name,
+        'color': category.color, // ARGB int
+      };
+    } catch (e) {
+      print('Error fetching category details: $e');
+      return null;
     }
   }
 }

@@ -33,4 +33,19 @@ class TaskProvider extends ChangeNotifier {
     _tasks.removeWhere((task) => task.id == taskId);
     notifyListeners(); // Notifica a los widgets que dependen de este estado
   }
+
+  Future<void> deleteTasksByCategoryId(String categoryId) async {
+    // Filtrar las tareas asociadas a la categoría
+    final tasksToDelete =
+        _tasks.where((task) => task.categoryId == categoryId).toList();
+
+    // Eliminar cada tarea individualmente
+    for (final task in tasksToDelete) {
+      await _taskService.deleteTask(task.id, true);
+      _tasks.removeWhere((t) => t.id == task.id);
+    }
+
+    // Notificar a los widgets que dependen de TaskProvider
+    notifyListeners();
+  }
 }

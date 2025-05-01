@@ -7,36 +7,37 @@ import 'package:taskify/features/tasks/provider/task_provider.dart';
 import 'package:taskify/features/auth/datasourse/auth_wrapper.dart';
 import 'package:taskify/features/auth/screens/login.dart';
 import 'package:taskify/features/auth/screens/register.dart';
-import 'package:taskify/features/calendar/screens/calendar.dart';
-import 'package:taskify/features/categories/screens/categories.dart';
-import 'package:taskify/features/profile/screens/profile.dart';
+import 'package:taskify/features/calendar/screens/calendar_screen.dart';
+import 'package:taskify/features/categories/screens/categories_screen.dart';
+import 'package:taskify/features/profile/screens/profile_screen.dart';
 import 'package:taskify/features/tasks/models/task.dart';
-import 'package:taskify/features/tasks/models/category.dart';
+import 'package:taskify/features/categories/models/category.dart';
 import 'package:taskify/features/tasks/models/subtask.dart';
-import 'package:taskify/features/tasks/screens/tasks.dart';
+import 'package:taskify/features/tasks/screens/tasks_screen.dart';
 import 'package:taskify/features/tasks/widgets/tasks_create_modal.dart';
+import 'package:taskify/features/categories/widgets/categories_create_modal.dart';
 import 'package:taskify/firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Inicializar Firebase
+  // Start Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // Inicializar Hive
+  // Start Hive
   await Hive.initFlutter();
-  // Limpiar las cajas de Hive (solo para desarrollo)
+  // Clean up Hive boxes if needed
   /*
   await Hive.deleteBoxFromDisk('tasks');
   await Hive.deleteBoxFromDisk('categories');
   await Hive.deleteBoxFromDisk('subtasks');
   */
-  // Registrar adaptadores
+  // Register Hive adapters
   Hive.registerAdapter(TaskAdapter());
   Hive.registerAdapter(CategoryAdapter());
   Hive.registerAdapter(SubtaskAdapter());
 
-  // Abrir cajas
+  // Open Hive boxes
   await Hive.openBox<Task>('tasks');
   await Hive.openBox<Category>('categories');
 
@@ -60,7 +61,7 @@ class MainApp extends StatelessWidget {
       routes: {
         '/login': (context) => const Login(),
         '/register': (context) => const Register(),
-        '/tasks': (context) => const Tasks(),
+        '/tasks': (context) => const TasksScreen(),
       },
     );
   }
@@ -76,7 +77,12 @@ class MainLayout extends StatefulWidget {
 class _MainLayoutState extends State<MainLayout> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = [Tasks(), Categories(), Calendar(), Profile()];
+  final List<Widget> _screens = [
+    TasksScreen(),
+    CategoriesScreen(),
+    CalendarScreen(),
+    ProfileScreen(),
+  ];
 
   final List _leading = [null, null, null, null];
 
@@ -101,34 +107,69 @@ class _MainLayoutState extends State<MainLayout> {
       body: _screens[_currentIndex],
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          final shouldReload = await showModalBottomSheet<bool>(
-            context: context,
-            isScrollControlled: true,
-            backgroundColor: Colors.transparent,
-            builder: (context) {
-              return Padding(
-                padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).viewInsets.bottom,
-                ),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(20),
+          if (_currentIndex == 1) {
+            // Abrir el modal para crear categorías
+            final shouldReload = await showModalBottomSheet<bool>(
+              context: context,
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              builder: (context) {
+                return Padding(
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom,
+                  ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(20),
+                      ),
                     ),
+                    constraints: BoxConstraints(
+                      maxHeight: MediaQuery.of(context).size.height * 0.9,
+                    ),
+                    child:
+                        const CategoriesCreateModal(), // Modal para crear categorías
                   ),
-                  constraints: BoxConstraints(
-                    maxHeight: MediaQuery.of(context).size.height * 0.9,
-                  ),
-                  child: const TasksCreateModal(),
-                ),
-              );
-            },
-          );
+                );
+              },
+            );
 
-          // Recargar las tareas si se creó una nueva
-          if (shouldReload == true) {
-            Provider.of<TaskProvider>(context, listen: false).loadTasks();
+            // Recargar las categorías si se creó una nueva
+            if (shouldReload == true) {
+              setState(() {}); // Recargar la pantalla de categorías
+            }
+          } else {
+            // Abrir el modal para crear tareas
+            final shouldReload = await showModalBottomSheet<bool>(
+              context: context,
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              builder: (context) {
+                return Padding(
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom,
+                  ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(20),
+                      ),
+                    ),
+                    constraints: BoxConstraints(
+                      maxHeight: MediaQuery.of(context).size.height * 0.9,
+                    ),
+                    child: const TasksCreateModal(), // Modal para crear tareas
+                  ),
+                );
+              },
+            );
+
+            // Recargar las tareas si se creó una nueva
+            if (shouldReload == true) {
+              Provider.of<TaskProvider>(context, listen: false).loadTasks();
+            }
           }
         },
         child: const Icon(Icons.add),

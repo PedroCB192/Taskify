@@ -2,8 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:taskify/features/tasks/models/category.dart' as taskify;
-import 'package:taskify/features/tasks/services/category_service.dart';
+import 'package:taskify/features/categories/models/category.dart' as taskify;
+import 'package:taskify/features/categories/services/category_service.dart';
 
 class AuthService {
   final FirebaseAuth _auth;
