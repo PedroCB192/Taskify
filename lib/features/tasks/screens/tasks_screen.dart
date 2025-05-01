@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:taskify/features/categories/widgets/categories_edit_modal.dart';
 import 'package:taskify/features/tasks/models/task.dart';
 import 'package:taskify/features/categories/services/category_service.dart';
+import 'package:taskify/features/tasks/widgets/tasks_create_modal.dart';
 import 'package:taskify/features/tasks/widgets/tasks_edit_modal.dart';
 import 'package:taskify/features/tasks/widgets/tasks_widget.dart';
 import 'package:taskify/features/tasks/provider/task_provider.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 class TasksScreen extends StatefulWidget {
-  const TasksScreen({super.key});
+  final String? categoryId;
+
+  const TasksScreen({super.key, this.categoryId});
 
   @override
   State<TasksScreen> createState() => _TasksScreenState();
@@ -37,10 +41,16 @@ class _TasksScreenState extends State<TasksScreen> {
   @override
   Widget build(BuildContext context) {
     final taskProvider = Provider.of<TaskProvider>(context);
-    final tasks = taskProvider.tasks;
-    final now = DateTime.now();
+    final tasks =
+        widget.categoryId == null
+            ? taskProvider
+                .tasks // Mostrar todas las tareas
+            : taskProvider.tasks
+                .where((task) => task.categoryId == widget.categoryId)
+                .toList(); // Filtrar por categoría
 
-    // Divide tasks into sections
+    // Categorizar las tareas
+    final now = DateTime.now();
     final overdueTasks =
         tasks
             .where(
@@ -61,16 +71,66 @@ class _TasksScreenState extends State<TasksScreen> {
     final completedTasks = tasks.where((task) => task.completed).toList();
 
     return Scaffold(
+      appBar:
+          widget.categoryId != null
+              ? PreferredSize(
+                preferredSize: const Size.fromHeight(kToolbarHeight),
+                child: FutureBuilder(
+                  future: categoryService.getCategoryById(widget.categoryId!),
+                  builder: (context, categorySnapshot) {
+                    if (categorySnapshot.hasError ||
+                        categorySnapshot.data == null) {
+                      return AppBar(
+                        title: const Text('Category Not Found'),
+                        backgroundColor: Theme.of(context).primaryColor,
+                      );
+                    }
+
+                    final category = categorySnapshot.data!;
+                    return AppBar(
+                      title: Text(category.name),
+                      backgroundColor: Color(
+                        category.color,
+                      ), // Usar el color de la categoría
+                      actions: [
+                        IconButton(
+                          icon: const Icon(Icons.add),
+                          onPressed: () {
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              builder: (context) => TasksCreateModal(),
+                            );
+                          },
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.edit),
+                          onPressed: () {
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              builder:
+                                  (context) =>
+                                      CategoriesEditModal(category: category),
+                            );
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              )
+              : null, // No mostrar AppBar si no hay categoryId
       body: ListView(
         children: [
           if (overdueTasks.isNotEmpty)
             _buildSection('Overdue Tasks', overdueTasks),
           if (todayTasks.isNotEmpty)
-            _buildSection('Today\'s TasksScreen', todayTasks),
+            _buildSection('Today\'s Tasks', todayTasks),
           if (futureTasks.isNotEmpty)
-            _buildSection('Future TasksScreen', futureTasks),
+            _buildSection('Future Tasks', futureTasks),
           if (completedTasks.isNotEmpty)
-            _buildSection('Completed TasksScreen', completedTasks),
+            _buildSection('Completed Tasks', completedTasks),
         ],
       ),
     );

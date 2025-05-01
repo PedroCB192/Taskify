@@ -159,4 +159,23 @@ class CategoryService {
       await _firestore.collection('categories').doc(id).delete();
     }
   }
+
+  // Retrieve category details by its ID
+  Future<Map<String, dynamic>?> getCategoryDetailsById(
+    String categoryId,
+  ) async {
+    try {
+      // Obtener la categoría desde Firestore o Hive
+      final category = await getCategoryById(categoryId);
+      if (category == null) return null;
+
+      return {
+        'name': category.name,
+        'color': category.color, // ARGB int
+      };
+    } catch (e) {
+      print('Error fetching category details: $e');
+      return null;
+    }
+  }
 }

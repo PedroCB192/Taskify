@@ -53,26 +53,24 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       body:
           _categories.isEmpty
               ? const Center(child: CircularProgressIndicator())
-              : Padding(
+              : GridView.builder(
                 padding: const EdgeInsets.all(16.0),
-                child: GridView.builder(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 16.0,
-                    mainAxisSpacing: 16.0,
-                    childAspectRatio: 0.8,
-                  ),
-                  itemCount: _categories.length,
-                  itemBuilder: (context, index) {
-                    final category = _categories[index];
-                    final taskCount = _taskCounts[category.id] ?? 0;
-
-                    return CategoriesWidget(
-                      category: category,
-                      taskCount: taskCount,
-                    );
-                  },
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 16.0,
+                  mainAxisSpacing: 16.0,
+                  childAspectRatio: 0.8,
                 ),
+                itemCount: _categories.length,
+                itemBuilder: (context, index) {
+                  final category = _categories[index];
+                  final taskCount = _taskCounts[category.id] ?? 0;
+
+                  return CategoriesWidget(
+                    category: category,
+                    taskCount: taskCount,
+                  );
+                },
               ),
     );
   }

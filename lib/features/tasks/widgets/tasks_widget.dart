@@ -7,12 +7,13 @@ import 'package:taskify/features/tasks/provider/task_provider.dart';
 import 'package:taskify/features/tasks/widgets/tasks_edit_modal.dart';
 import 'package:audioplayers/audioplayers.dart';
 
-class TasksWidget extends StatefulWidget {
+class TasksWidget extends StatelessWidget {
   final Task task;
-  final Color categoryColor;
+  final Color categoryColor; // Asegúrate de que sea del tipo Color
   final bool isExpanded;
   final VoidCallback onExpansionChanged;
   final VoidCallback onTaskUpdated;
+  final VoidCallback onTap;
 
   const TasksWidget({
     super.key,
@@ -21,21 +22,15 @@ class TasksWidget extends StatefulWidget {
     required this.isExpanded,
     required this.onExpansionChanged,
     required this.onTaskUpdated,
-    required Future<Null> Function() onTap,
+    required this.onTap,
   });
 
   @override
-  State<TasksWidget> createState() => _TasksWidgetState();
-}
-
-class _TasksWidgetState extends State<TasksWidget> {
-  @override
   Widget build(BuildContext context) {
-    final taskColor =
-        widget.task.completed ? Colors.grey : widget.categoryColor;
+    final taskColor = task.completed ? Colors.grey : categoryColor;
 
     // Format the date using intl
-    final formattedDate = DateFormat('yyyy-MM-dd').format(widget.task.date);
+    final formattedDate = DateFormat('yyyy-MM-dd').format(task.date);
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
@@ -52,7 +47,7 @@ class _TasksWidgetState extends State<TasksWidget> {
           showModalBottomSheet(
             context: context,
             isScrollControlled: true,
-            builder: (context) => TasksEditModal(task: widget.task),
+            builder: (context) => TasksEditModal(task: task),
           );
         },
         child: Column(
@@ -63,7 +58,7 @@ class _TasksWidgetState extends State<TasksWidget> {
                   try {
                     final player = AudioPlayer();
 
-                    if (widget.task.completed) {
+                    if (task.completed) {
                       // Reproducir sonido "pop-off" al descompletar
                       await player.play(AssetSource('sounds/pop-off.mp3'));
                     } else {
@@ -72,14 +67,14 @@ class _TasksWidgetState extends State<TasksWidget> {
                     }
 
                     // Toggle task completion
-                    final updatedTask = widget.task.copyWith(
-                      completed: !widget.task.completed,
+                    final updatedTask = task.copyWith(
+                      completed: !task.completed,
                     );
                     Provider.of<TaskProvider>(
                       context,
                       listen: false,
                     ).updateTask(updatedTask);
-                    widget.onTaskUpdated();
+                    onTaskUpdated();
                   } catch (e) {
                     print('Error reproduciendo el sonido: $e');
                   }
@@ -90,15 +85,12 @@ class _TasksWidgetState extends State<TasksWidget> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color:
-                          widget.task.completed
-                              ? Colors.grey
-                              : widget.categoryColor,
+                      color: task.completed ? Colors.grey : categoryColor,
                       width: 2,
                     ),
                   ),
                   child:
-                      widget.task.completed
+                      task.completed
                           ? const Icon(
                             Icons.check,
                             color: Colors.grey,
@@ -108,10 +100,10 @@ class _TasksWidgetState extends State<TasksWidget> {
                 ),
               ),
               title: Text(
-                widget.task.name,
+                task.name,
                 style: TextStyle(
                   decoration:
-                      widget.task.completed
+                      task.completed
                           ? TextDecoration.lineThrough
                           : TextDecoration.none,
                 ),
@@ -127,13 +119,11 @@ class _TasksWidgetState extends State<TasksWidget> {
                 ],
               ),
               trailing: IconButton(
-                icon: Icon(
-                  widget.isExpanded ? Icons.expand_less : Icons.expand_more,
-                ),
-                onPressed: widget.onExpansionChanged,
+                icon: Icon(isExpanded ? Icons.expand_less : Icons.expand_more),
+                onPressed: onExpansionChanged,
               ),
             ),
-            if (widget.isExpanded && widget.task.subtasks != null)
+            if (isExpanded && task.subtasks != null)
               Padding(
                 padding: const EdgeInsets.only(
                   left: 16.0,
@@ -142,22 +132,20 @@ class _TasksWidgetState extends State<TasksWidget> {
                 ),
                 child: Column(
                   children:
-                      widget.task.subtasks!.map((subtask) {
+                      task.subtasks!.map((subtask) {
                         return SubtasksWidget(
                           subtask: subtask,
                           onSubtaskToggled: () {
-                            setState(() {
-                              subtask.completed = !subtask.completed;
-                            });
+                            subtask.completed = !subtask.completed;
                             // Update the task in the provider
-                            final updatedTask = widget.task.copyWith(
-                              subtasks: widget.task.subtasks,
+                            final updatedTask = task.copyWith(
+                              subtasks: task.subtasks,
                             );
                             Provider.of<TaskProvider>(
                               context,
                               listen: false,
                             ).updateTask(updatedTask);
-                            widget.onTaskUpdated();
+                            onTaskUpdated();
                           },
                         );
                       }).toList(),
@@ -168,4 +156,18 @@ class _TasksWidgetState extends State<TasksWidget> {
       ),
     );
   }
+}
+
+List<Widget> buildTaskWidgets(List<Task> tasks, Color? _categoryColor) {
+  return tasks.map((task) {
+    return TasksWidget(
+      task: task,
+      categoryColor:
+          _categoryColor ?? Colors.grey, // Asegurarse de que nunca sea null
+      isExpanded: false,
+      onExpansionChanged: () {},
+      onTaskUpdated: () {},
+      onTap: () {},
+    );
+  }).toList();
 }

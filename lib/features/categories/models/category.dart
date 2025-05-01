@@ -52,4 +52,21 @@ class Category {
 
   // Convert the integer color back to a Flutter Color object
   Color get colorAsColor => Color(color);
+
+  // Add the copyWith method
+  Category copyWith({
+    String? id,
+    String? name,
+    bool? isSynced,
+    String? userId,
+    int? color,
+  }) {
+    return Category(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      isSynced: isSynced ?? this.isSynced,
+      userId: userId ?? this.userId,
+      color: color ?? this.color,
+    );
+  }
 }
