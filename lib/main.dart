@@ -27,36 +27,33 @@ import 'package:taskify/features/profile/provider/user_provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Iniciar Firebase
+  // Start Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // Iniciar Hive
+  // Start Hive
   await Hive.initFlutter();
 
-  // Registrar adaptadores de Hive
+  // Hive adapters
   Hive.registerAdapter(TaskAdapter());
   Hive.registerAdapter(CategoryAdapter());
   Hive.registerAdapter(SubtaskAdapter());
-  Hive.registerAdapter(
-    local.UserAdapter(),
-  ); // Registrar el adaptador para el modelo User
+  Hive.registerAdapter(local.UserAdapter());
 
-  // Abrir cajas de Hive
+  // Open Hive boxes
   await Hive.openBox<Task>('tasks');
   await Hive.openBox<Category>('categories');
-  await Hive.openBox<local.User>('userBox'); // Abrir la caja para el usuario
+  await Hive.openBox<local.User>('userBox');
 
-  // Guardar el usuario al abrir la app
+  // Save user data to Hive
   await initializeUser();
-  await initializeAppData();
 
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => TaskProvider()),
         ChangeNotifierProvider(
-          create: (_) => UserProvider(),
-        ), // Agregar UserProvider
+          create: (_) => UserProvider()..loadUser(), // get user data from Hive
+        ),
       ],
       child: const MainApp(),
     ),
@@ -68,25 +65,25 @@ Future<void> initializeUser() async {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final UserService _userService = UserService();
 
-  // Verificar si hay un usuario autenticado
+  // Verify if the user is logged in
   final firebaseUser = _auth.currentUser;
 
   if (firebaseUser != null) {
     try {
-      // Obtener los datos del usuario desde Firestore
+      // Get user data from Firestore
       final userDoc =
           await _firestore.collection('users').doc(firebaseUser.uid).get();
       final userData = userDoc.data();
 
       if (userData != null) {
-        // Crear una instancia del modelo User
+        // Create a local user model
         final local.User user = local.User(
           id: firebaseUser.uid,
           name: userData['name'],
           isPremium: userData['isPremium'],
         );
 
-        // Guardar el usuario en Hive
+        // Save user data to Hive
         await _userService.saveUser(user);
 
         print('User saved locally: ${user.name}, Premium: ${user.isPremium}');
@@ -103,10 +100,10 @@ Future<void> initializeAppData() async {
   final categoryService = CategoryService();
   final taskService = TaskService();
 
-  // Sincronizar categorías
+  // Sync categories
   await categoryService.syncCategories();
 
-  // Sincronizar tareas
+  // Synce tasks
   await taskService.syncTasks();
 }
 
@@ -157,9 +154,6 @@ class _MainLayoutState extends State<MainLayout> {
 
   @override
   Widget build(BuildContext context) {
-    final isPremium = Provider.of<UserProvider>(context).isPremium;
-    final user = Provider.of<UserProvider>(context).user;
-
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -168,36 +162,7 @@ class _MainLayoutState extends State<MainLayout> {
         ),
         leading: _leading[_currentIndex],
       ),
-      body: Column(
-        children: [
-          if (user != null) // Verificar que el usuario no sea nulo
-            Container(
-              color: isPremium ? Colors.green : Colors.red,
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    isPremium
-                        ? 'You are a Premium User!'
-                        : 'You are not a Premium User.',
-                    style: const TextStyle(color: Colors.white, fontSize: 16),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'User Name: ${user.name}',
-                    style: const TextStyle(color: Colors.white, fontSize: 14),
-                  ),
-                  Text(
-                    'User ID: ${user.id}',
-                    style: const TextStyle(color: Colors.white, fontSize: 14),
-                  ),
-                ],
-              ),
-            ),
-          Expanded(child: _screens[_currentIndex]),
-        ],
-      ),
+      body: Column(children: [Expanded(child: _screens[_currentIndex])]),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           if (_currentIndex == 1) {
@@ -227,12 +192,12 @@ class _MainLayoutState extends State<MainLayout> {
               },
             );
 
-            // Recargar las categorías si se creó una nueva
+            // Recharge the categories if a new one was created
             if (shouldReload == true) {
-              setState(() {}); // Recargar la pantalla de categorías
+              setState(() {});
             }
           } else {
-            // Abrir el modal para crear tareas
+            // Open the modal to create tasks
             final shouldReload = await showModalBottomSheet<bool>(
               context: context,
               isScrollControlled: true,
@@ -258,7 +223,7 @@ class _MainLayoutState extends State<MainLayout> {
               },
             );
 
-            // Recargar las tareas si se creó una nueva
+            // Recharge the tasks if a new one was created
             if (shouldReload == true) {
               Provider.of<TaskProvider>(context, listen: false).loadTasks();
             }
@@ -275,7 +240,7 @@ class _MainLayoutState extends State<MainLayout> {
           children: [
             _buildNavIcon(0, Icons.task),
             _buildNavIcon(1, Icons.category),
-            const SizedBox(width: 40), // Espacio para el FAB
+            const SizedBox(width: 40), // Space for the FAB
             _buildNavIcon(2, Icons.calendar_today),
             _buildNavIcon(3, Icons.person),
           ],

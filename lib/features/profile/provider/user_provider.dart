@@ -3,7 +3,7 @@ import 'package:taskify/features/profile/models/user.dart';
 import 'package:taskify/features/profile/services/user_service.dart';
 
 class UserProvider with ChangeNotifier {
-  User? _user; // Modelo de usuario de tu aplicación
+  User? _user; // User object to hold user data
 
   User? get user => _user;
 
@@ -12,19 +12,19 @@ class UserProvider with ChangeNotifier {
   final UserService _userService = UserService();
 
   Future<void> loadUser() async {
-    _user = _userService.getUser(); // Cargar el usuario desde Hive
+    _user = _userService.getUser(); // Upload user from Hive
     notifyListeners();
   }
 
   Future<void> updateUser(User user) async {
-    _user = user; // Actualizar el usuario localmente
-    await _userService.saveUser(user); // Guardar en Hive
+    _user = user; // Update user locally
+    await _userService.saveUser(user); // Save user to Hive
     notifyListeners();
   }
 
   Future<void> clearUser() async {
-    _user = null; // Limpiar el usuario localmente
-    await _userService.deleteUser(); // Eliminar de Hive
+    _user = null; // Clear user locally
+    await _userService.deleteUser(); // Delete user from Hive
     notifyListeners();
   }
 }
