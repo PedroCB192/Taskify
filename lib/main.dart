@@ -115,11 +115,12 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: appLightTheme,
-      home: const MainLayout(),
+      home:
+          const MainLayout(), // Redirigir al MainLayout como pantalla principal
       routes: {
         '/login': (context) => const Login(),
         '/register': (context) => const Register(),
-        '/tasks': (context) => const TasksScreen(),
+        '/tasks': (context) => const MainLayout(), // Ruta para MainLayout
       },
     );
   }
