@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:taskify/core/constants/app_colors.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 ThemeData appLightTheme = ThemeData(
   // ========== Global ==========
@@ -85,4 +86,47 @@ ThemeData appLightTheme = ThemeData(
       padding: WidgetStateProperty.all(const EdgeInsets.symmetric(vertical: 8)),
     ),
   ),
+);
+
+CalendarStyle customCalendarStyle = CalendarStyle(
+  todayDecoration: BoxDecoration(
+    color: AppColors.roseBonbon,
+    shape: BoxShape.circle,
+  ),
+  selectedDecoration: BoxDecoration(
+    color: AppColors.argentinianBlue,
+    shape: BoxShape.circle,
+  ),
+  weekendTextStyle: const TextStyle(color: AppColors.skyMagenta),
+  defaultTextStyle: const TextStyle(color: AppColors.textPrimary),
+  outsideTextStyle: const TextStyle(color: AppColors.textHint),
+  disabledTextStyle: const TextStyle(color: AppColors.textHint),
+  holidayTextStyle: const TextStyle(color: AppColors.lavenderFloral),
+  markerDecoration: BoxDecoration(
+    color: AppColors.skyMagenta,
+    shape: BoxShape.circle,
+  ),
+);
+
+HeaderStyle customHeaderStyle = HeaderStyle(
+  formatButtonVisible: false,
+  titleCentered: true,
+  titleTextStyle: const TextStyle(
+    color: AppColors.textPrimary,
+    fontSize: 18,
+    fontWeight: FontWeight.bold,
+  ),
+  leftChevronIcon: const Icon(
+    Icons.chevron_left,
+    color: AppColors.argentinianBlue,
+  ),
+  rightChevronIcon: const Icon(
+    Icons.chevron_right,
+    color: AppColors.argentinianBlue,
+  ),
+);
+
+DaysOfWeekStyle customDaysOfWeekStyle = DaysOfWeekStyle(
+  weekdayStyle: const TextStyle(color: AppColors.textSecondary),
+  weekendStyle: const TextStyle(color: AppColors.skyMagenta),
 );
