@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:taskify/core/constants/app_colors.dart';
-import 'package:taskify/features/auth/datasourse/auth_service.dart';
+import 'package:taskify/features/auth/services/auth_service.dart';
 
 class Register extends StatefulWidget {
   const Register({super.key});
