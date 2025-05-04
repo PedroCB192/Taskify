@@ -14,8 +14,32 @@ class ProfileScreen extends StatelessWidget {
     final user = userProvider.user;
 
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text('No user data available')),
+      return Scaffold(
+        body: Center(
+          child: Column(
+            children: [
+              Text("No User Data Available"),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () async {
+                  final authService = AuthService();
+                  await authService.signOut();
+                  Navigator.of(context).pushReplacementNamed('/login');
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                ),
+                child: const Text(
+                  'Sign Out',
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                ),
+              ),
+            ],
+          ),
+        ),
       );
     }
 

@@ -34,25 +34,31 @@ class _LoginState extends State<Login> {
     // Ocultar el teclado al hacer login
     FocusScope.of(context).unfocus();
 
-    setState(() => _isLoading = true);
-    
+    if (mounted) setState(() => _isLoading = true);
+
     try {
       final user = await _auth.signInWithEmailAndPassword(
         _emailController.text,
         _passwordController.text,
       );
 
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
 
       if (user != null) {
-        Navigator.of(context).pushReplacementNamed('/tasks');
+        Navigator.of(
+          context,
+        ).pushReplacementNamed('/main'); // Redirigir a MainLayout
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error desconocido al iniciar sesión')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Error desconocido al iniciar sesión'),
+            ),
+          );
+        }
       }
-    } on FirebaseAuthException catch (e) {  // <--- AQUÍ VA EL BLOQUE DE MANEJO DE ERRORES
-      setState(() => _isLoading = false);
+    } on FirebaseAuthException catch (e) {
+      if (mounted) setState(() => _isLoading = false);
       String message = 'Login failed';
       if (e.code == 'user-not-found') {
         message = 'No user found with this email';
@@ -63,14 +69,20 @@ class _LoginState extends State<Login> {
       } else if (e.code == 'invalid-email') {
         message = 'Invalid email format';
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
-      );
-    } catch (e) {  // Captura cualquier otro error no específico de Firebase
-      setState(() => _isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('An unexpected error occurred: ${e.toString()}')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(message)));
+      }
+    } catch (e) {
+      if (mounted) setState(() => _isLoading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('An unexpected error occurred: ${e.toString()}'),
+          ),
+        );
+      }
     }
   }
 
@@ -104,7 +116,9 @@ class _LoginState extends State<Login> {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your email';
                     }
-                    if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(value)) {
+                    if (!RegExp(
+                      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+                    ).hasMatch(value)) {
                       return 'Please enter a valid email';
                     }
                     return null;
@@ -142,9 +156,10 @@ class _LoginState extends State<Login> {
                     Expanded(
                       child: ElevatedButton(
                         onPressed: _isLoading ? null : _login,
-                        child: _isLoading
-                            ? const CircularProgressIndicator()
-                            : const Text('Login'),
+                        child:
+                            _isLoading
+                                ? const CircularProgressIndicator()
+                                : const Text('Login'),
                       ),
                     ),
                     const SizedBox(width: 16),

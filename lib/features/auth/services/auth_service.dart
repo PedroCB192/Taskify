@@ -76,12 +76,12 @@ class AuthService {
 
         // Crear la categoría "No Category" para el nuevo usuario
         final defaultCategory = taskify.Category(
-          id: 'default', // ID único para la categoría predeterminada
+          id: 'default',
           name: 'No Category',
           userId: user.uid,
-          color: Colors.black.value, // Color predeterminado (negro)
+          color: Colors.black.value,
         );
-        await _categoryService.addCategory(defaultCategory); // No premium
+        await _categoryService.addCategory(defaultCategory);
 
         // Guardar el usuario localmente
         await _saveUserLocally(user);

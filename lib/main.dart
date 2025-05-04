@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:taskify/core/constants/app_themes.dart';
+import 'package:taskify/features/auth/datasourse/auth_wrapper.dart';
 import 'package:taskify/features/categories/services/category_service.dart';
 import 'package:taskify/features/profile/models/user.dart' as local;
 import 'package:taskify/features/tasks/provider/task_provider.dart';
@@ -58,6 +59,11 @@ void main() async {
       child: const MainApp(),
     ),
   );
+
+  // Inicializar datos después de que la app esté corriendo
+  WidgetsBinding.instance.addPostFrameCallback((_) async {
+    await initializeAppData();
+  });
 }
 
 Future<void> initializeUser() async {
@@ -115,12 +121,11 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: appLightTheme,
-      home:
-          const MainLayout(), // Redirigir al MainLayout como pantalla principal
+      home: const AuthWrapper(), // Usar AuthWrapper como la pantalla inicial
       routes: {
         '/login': (context) => const Login(),
         '/register': (context) => const Register(),
-        '/tasks': (context) => const MainLayout(), // Ruta para MainLayout
+        '/main': (context) => const MainLayout(),
       },
     );
   }
