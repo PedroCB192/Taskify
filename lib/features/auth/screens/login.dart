@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:taskify/core/constants/app_colors.dart';
 import 'package:taskify/features/auth/services/auth_service.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -51,23 +52,28 @@ class _LoginState extends State<Login> {
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Error desconocido al iniciar sesión'),
+            SnackBar(
+              content: Text(
+                AppLocalizations.of(context)!.errorLoggingInPleaseTryAgain,
+              ),
             ),
           );
         }
       }
     } on FirebaseAuthException catch (e) {
       if (mounted) setState(() => _isLoading = false);
-      String message = 'Login failed';
+      String message = AppLocalizations.of(context)!.loginFailed;
       if (e.code == 'user-not-found') {
-        message = 'No user found with this email';
+        message = AppLocalizations.of(context)!.noUserFoundWithThisEmail;
       } else if (e.code == 'wrong-password') {
-        message = 'Incorrect password';
+        message = AppLocalizations.of(context)!.incorrectPassword;
       } else if (e.code == 'too-many-requests') {
-        message = 'Too many attempts. Account temporarily locked';
+        message =
+            AppLocalizations.of(
+              context,
+            )!.tooManyAttemptsAccountTemporarilyLocked;
       } else if (e.code == 'invalid-email') {
-        message = 'Invalid email format';
+        message = AppLocalizations.of(context)!.invalidEmailFormat;
       }
       if (mounted) {
         ScaffoldMessenger.of(
@@ -110,16 +116,20 @@ class _LoginState extends State<Login> {
                 // Email
                 TextFormField(
                   controller: _emailController,
-                  decoration: const InputDecoration(labelText: 'Email'),
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.email,
+                  ),
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
+                      return AppLocalizations.of(context)!.pleaseEnterYourEmail;
                     }
                     if (!RegExp(
                       r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
                     ).hasMatch(value)) {
-                      return 'Please enter a valid email';
+                      return AppLocalizations.of(
+                        context,
+                      )!.pleaseEnterAValidEmail;
                     }
                     return null;
                   },
@@ -129,13 +139,19 @@ class _LoginState extends State<Login> {
                 TextFormField(
                   controller: _passwordController,
                   obscureText: true,
-                  decoration: const InputDecoration(labelText: 'Password'),
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.password,
+                  ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your password';
+                      return AppLocalizations.of(
+                        context,
+                      )!.pleaseEnterYourPassword;
                     }
                     if (value.length < 6) {
-                      return 'Password must be at least 6 characters';
+                      return AppLocalizations.of(
+                        context,
+                      )!.passwordMustBeAtLeast6Characters;
                     }
                     return null;
                   },
@@ -146,7 +162,7 @@ class _LoginState extends State<Login> {
                   alignment: Alignment.centerRight,
                   child: TextButton(
                     onPressed: () {},
-                    child: Text('Forgot Password?'),
+                    child: Text(AppLocalizations.of(context)!.forgotPassword),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -159,7 +175,7 @@ class _LoginState extends State<Login> {
                         child:
                             _isLoading
                                 ? const CircularProgressIndicator()
-                                : const Text('Login'),
+                                : Text(AppLocalizations.of(context)!.login),
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -168,7 +184,9 @@ class _LoginState extends State<Login> {
                         onPressed: () {
                           Navigator.pushNamed(context, "/register");
                         },
-                        child: const Text('Create Account'),
+                        child: Text(
+                          AppLocalizations.of(context)!.createAccount,
+                        ),
                       ),
                     ),
                   ],

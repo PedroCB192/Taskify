@@ -13,6 +13,8 @@ ThemeData appLightTheme = ThemeData(
     centerTitle: true,
     elevation: 2,
     titleTextStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+    shadowColor: Colors.black,
+    scrolledUnderElevation: 15,
   ),
 
   // ========== BottomAppBar Global ==========
@@ -31,6 +33,25 @@ ThemeData appLightTheme = ThemeData(
 
   // ========== IconButtons (BottomNav) ==========
   iconTheme: IconThemeData(color: Colors.white, size: 28),
+
+  // ========== NavigationRail ==========
+  navigationRailTheme: NavigationRailThemeData(
+    backgroundColor: AppColors.vistaBlue,
+    elevation: 8,
+    selectedIconTheme: IconThemeData(color: Colors.white),
+    unselectedIconTheme: IconThemeData(color: Colors.white.withOpacity(0.6)),
+    selectedLabelTextStyle: TextStyle(
+      color: Colors.white,
+      fontSize: 14,
+      fontWeight: FontWeight.w600,
+    ),
+    unselectedLabelTextStyle: TextStyle(
+      color: Colors.white.withOpacity(0.6),
+      fontSize: 14,
+      fontWeight: FontWeight.w400,
+    ),
+    indicatorColor: Colors.transparent,
+  ),
 
   // ========== Inputs (TextField, DropdownMenu) ==========
   inputDecorationTheme: InputDecorationTheme(

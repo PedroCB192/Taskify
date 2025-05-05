@@ -4,7 +4,9 @@ import 'package:taskify/features/auth/screens/login.dart';
 import 'package:taskify/main.dart';
 
 class AuthWrapper extends StatelessWidget {
-  const AuthWrapper({super.key});
+  final Function(Locale) changeLanguage; // Añade esto
+
+  const AuthWrapper({super.key, required this.changeLanguage});
 
   @override
   Widget build(BuildContext context) {
@@ -12,13 +14,15 @@ class AuthWrapper extends StatelessWidget {
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
         }
-        
+
         if (snapshot.hasData) {
           return const MainLayout(); // Main layout for authenticated users
         }
-        
+
         return const Login(); // Login screen for unauthenticated users
       },
     );

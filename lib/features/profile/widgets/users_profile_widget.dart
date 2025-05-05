@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:taskify/features/profile/models/user.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class UsersProfileWidget extends StatelessWidget {
   final User user;
@@ -38,8 +39,10 @@ class UsersProfileWidget extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             user.isPremium
-                ? 'Premium User'
-                : 'Free User', // Show if the user is premium or free
+                ? AppLocalizations.of(context)!.premiumUser
+                : AppLocalizations.of(
+                  context,
+                )!.freeUser, // Show if the user is premium or free
             style: TextStyle(
               fontSize: 16,
               color: user.isPremium ? Colors.green : Colors.red,

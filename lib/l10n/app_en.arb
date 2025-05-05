@@ -1,0 +1,95 @@
+{
+  "@@locale": "en",
+  "tasks": "Tasks",
+  "categories": "Categories",
+  "calendar": "Calendar",
+  "profile": "Profile",
+  "taskify": "Taskify",
+  "errorLoggingInPleaseTryAgain": "Error logging in. Please try again.",
+  "loginFailed": "Login failed",
+  "noUserFoundWithThisEmail": "No user found with this email",
+  "incorrectPassword": "Incorrect password",
+  "tooManyRequests": "too-many-requests",
+  "tooManyAttemptsAccountTemporarilyLocked": "Too many attempts. Account temporarily locked",
+  "invalidEmailFormat": "Invalid email format",
+  "email": "Email",
+  "pleaseEnterYourEmail": "Please enter your email",
+  "pleaseEnterAValidEmail": "Please enter a valid email",
+  "password": "Password",
+  "pleaseEnterYourPassword": "Please enter your password",
+  "passwordMustBeAtLeast6Characters": "Password must be at least 6 characters",
+  "forgotPassword": "Forgot Password?",
+  "login": "Login",
+  "createAccount": "Create Account",
+  "errorToRegister": "Error to register",
+  "accountCreatedSuccessfully": "Account created successfully!",
+  "theEmailIsAlreadyInUse": "the email is already in use",
+  "formatOfEmailIsInvalid": "format of email is invalid",
+  "thePasswordMustBeAtLeast6CharactersLong": "The password must be at least 6 characters long.",
+  "operationNotAllowed": "Operation not allowed",
+  "username": "Username",
+  "pleaseEnterYourUsername": "Please enter your username",
+  "theUsernameMustBeAtLeast4Characters": "The username must be at least 4 characters",
+  "onlyLettersNumbersAndUnderscoresAreAllowed": "Only letters, numbers, and underscores are allowed",
+  "categoryNameCannotBeEmpty": "Category name cannot be empty",
+  "failedToSaveCategory": "Failed to save category",
+  "categoryName": "Category Name",
+  "selectAColor": "Select a Color:",
+  "deleteCategory": "Delete Category",
+  "allTasksAssociatedWithThisCategoryWillBeDeletedAreYouSureYouWantToProceed": "All tasks associated with this category will be deleted. Are you sure you want to proceed?",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "failedToDeleteCategoryAndTasks": "Failed to delete category and tasks",
+  "taskcountTasks": "{taskCount} Tasks",
+  "@taskcountTasks": {
+    "placeholders": {
+      "taskCount": {
+        "type": "int"
+      }
+    }
+  },
+  "noUserDataAvailable": "No User Data Available",
+  "becomePremium": "Become Premium",
+  "unlockPremiumFeaturesByUpgradingYourAccount": "Unlock premium features by upgrading your account!",
+  "upgradeNow": "Upgrade Now",
+  "totalTasksTotaltasks": "Total Tasks: {totalTasks}",
+  "@totalTasksTotaltasks": {
+    "placeholders": {
+      "totalTasks": {
+        "type": "int"
+      }
+    }
+  },
+  "completedTasks": "Completed Tasks",
+  "incompletedTasks": "Incompleted Tasks",
+  "premiumUser": "Premium User",
+  "freeUser": "Free User",
+  "addNewCategory": "Add new category",
+  "enterCategoryName": "Enter category name",
+  "add": "Add",
+  "taskName": "Task Name",
+  "subtaskIndex": "Subtask {index}",
+  "@subtaskIndex": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "selectCategory": "Select Category",
+  "dueFormatteddate": "Due: {formattedDate}",
+  "@dueFormatteddate": {
+    "placeholders": {
+      "formattedDate": {
+        "type": "String"
+      }
+    }
+  },
+  "overdueTasks": "Overdue Tasks",
+  "todaysTasks": "Today's Tasks",
+  "futureTasks": "Future Tasks",
+  "newTask": "New Task",
+  "editTask": "Edit Task",
+  "newCategory": "New Category",
+  "editCategory": "Edit Category"
+}

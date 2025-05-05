@@ -1,0 +1,95 @@
+{
+  "@@locale": "es",
+  "tasks": "Tareas",
+  "categories": "Categorías",
+  "calendar": "Calendario",
+  "profile": "Perfil",
+  "taskify": "Taskify",
+  "errorLoggingInPleaseTryAgain": "Error al iniciar sesión. Por favor inténtalo de nuevo.",
+  "loginFailed": "Inicio de sesión fallido",
+  "noUserFoundWithThisEmail": "No se encontró ningún usuario con este correo",
+  "incorrectPassword": "Contraseña incorrecta",
+  "tooManyRequests": "demasiadas-solicitudes",
+  "tooManyAttemptsAccountTemporarilyLocked": "Demasiados intentos. Cuenta bloqueada temporalmente",
+  "invalidEmailFormat": "Formato de correo inválido",
+  "email": "Correo electrónico",
+  "pleaseEnterYourEmail": "Por favor ingresa tu correo",
+  "pleaseEnterAValidEmail": "Por favor ingresa un correo válido",
+  "password": "Contraseña",
+  "pleaseEnterYourPassword": "Por favor ingresa tu contraseña",
+  "passwordMustBeAtLeast6Characters": "La contraseña debe tener al menos 6 caracteres",
+  "forgotPassword": "¿Olvidaste tu contraseña?",
+  "login": "Iniciar sesión",
+  "createAccount": "Crear cuenta",
+  "errorToRegister": "Error al registrarse",
+  "accountCreatedSuccessfully": "¡Cuenta creada exitosamente!",
+  "theEmailIsAlreadyInUse": "el correo ya está en uso",
+  "formatOfEmailIsInvalid": "el formato del correo es inválido",
+  "thePasswordMustBeAtLeast6CharactersLong": "La contraseña debe tener al menos 6 caracteres.",
+  "operationNotAllowed": "Operación no permitida",
+  "username": "Nombre de usuario",
+  "pleaseEnterYourUsername": "Por favor ingresa tu nombre de usuario",
+  "theUsernameMustBeAtLeast4Characters": "El nombre de usuario debe tener al menos 4 caracteres",
+  "onlyLettersNumbersAndUnderscoresAreAllowed": "Solo se permiten letras, números y guiones bajos",
+  "categoryNameCannotBeEmpty": "El nombre de la categoría no puede estar vacío",
+  "failedToSaveCategory": "Error al guardar la categoría",
+  "categoryName": "Nombre de categoría",
+  "selectAColor": "Selecciona un color:",
+  "deleteCategory": "Eliminar categoría",
+  "allTasksAssociatedWithThisCategoryWillBeDeletedAreYouSureYouWantToProceed": "Todas las tareas asociadas a esta categoría serán eliminadas. ¿Estás seguro de continuar?",
+  "cancel": "Cancelar",
+  "delete": "Eliminar",
+  "failedToDeleteCategoryAndTasks": "Error al eliminar categoría y tareas",
+  "taskcountTasks": "{taskCount} Tareas",
+  "@taskcountTasks": {
+    "placeholders": {
+      "taskCount": {
+        "type": "int"
+      }
+    }
+  },
+  "noUserDataAvailable": "No hay datos de usuario disponibles",
+  "becomePremium": "Hazte Premium",
+  "unlockPremiumFeaturesByUpgradingYourAccount": "¡Desbloquea funciones premium actualizando tu cuenta!",
+  "upgradeNow": "Actualizar ahora",
+  "totalTasksTotaltasks": "Tareas totales: {totalTasks}",
+  "@totalTasksTotaltasks": {
+    "placeholders": {
+      "totalTasks": {
+        "type": "int"
+      }
+    }
+  },
+  "completedTasks": "Tareas completadas",
+  "incompletedTasks": "Tareas incompletas",
+  "premiumUser": "Usuario Premium",
+  "freeUser": "Usuario Gratis",
+  "addNewCategory": "Añadir nueva categoría",
+  "enterCategoryName": "Ingresa nombre de categoría",
+  "add": "Añadir",
+  "taskName": "Nombre de tarea",
+  "subtaskIndex": "Subtarea {index}",
+  "@subtaskIndex": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "selectCategory": "Seleccionar categoría",
+  "dueFormatteddate": "Vence: {formattedDate}",
+  "@dueFormatteddate": {
+    "placeholders": {
+      "formattedDate": {
+        "type": "String"
+      }
+    }
+  },
+  "overdueTasks": "Tareas vencidas",
+  "todaysTasks": "Tareas de hoy",
+  "futureTasks": "Tareas futuras",
+  "newTask": "Nueva tarea",
+  "editTask": "Editar tarea",
+  "newCategory": "Nueva categoría",
+  "editCategory": "Editar categoría"
+}

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:taskify/features/categories/models/category.dart';
 import 'package:taskify/features/tasks/screens/tasks_screen.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CategoriesWidget extends StatelessWidget {
   final Category category;
@@ -56,7 +57,7 @@ class CategoriesWidget extends StatelessWidget {
 
             // Cantidad de tareas
             Text(
-              '$taskCount Tasks',
+              AppLocalizations.of(context)!.taskcountTasks(taskCount),
               style: const TextStyle(fontSize: 14, color: Colors.grey),
               textAlign: TextAlign.center,
             ),

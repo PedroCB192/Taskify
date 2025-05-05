@@ -8,6 +8,7 @@ import 'package:taskify/features/tasks/models/subtask.dart';
 import 'package:taskify/features/tasks/services/task_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TasksCreateModal extends StatefulWidget {
   const TasksCreateModal({super.key});
@@ -79,18 +80,20 @@ class _TasksCreateModalState extends State<TasksCreateModal> {
             builder: (context, setState) {
               return AlertDialog(
                 backgroundColor: AppColors.backgroundLight,
-                title: const Text('Add new category'),
+                title: Text(AppLocalizations.of(context)!.addNewCategory),
                 content: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     TextField(
                       controller: categoryController,
-                      decoration: const InputDecoration(
-                        label: Text("Enter category name"),
+                      decoration: InputDecoration(
+                        label: Text(
+                          AppLocalizations.of(context)!.enterCategoryName,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 16),
-                    const Text('Select a color:'),
+                    Text(AppLocalizations.of(context)!.selectAColor),
                     const SizedBox(height: 8),
                     Wrap(
                       spacing: 10,
@@ -126,7 +129,7 @@ class _TasksCreateModalState extends State<TasksCreateModal> {
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(context),
-                    child: const Text('Cancel'),
+                    child: Text(AppLocalizations.of(context)!.cancel),
                   ),
                   ElevatedButton(
                     onPressed: () async {
@@ -172,7 +175,7 @@ class _TasksCreateModalState extends State<TasksCreateModal> {
                       categoryController.clear();
                       Navigator.pop(context);
                     },
-                    child: const Text('Add'),
+                    child: Text(AppLocalizations.of(context)!.add),
                   ),
                 ],
               );
@@ -210,16 +213,16 @@ class _TasksCreateModalState extends State<TasksCreateModal> {
           children: <Widget>[
             // Title
             Text(
-              'New Task',
+              AppLocalizations.of(context)!.newTask,
               style: TextStyle(fontSize: 25, color: AppColors.roseBonbon),
             ),
             const SizedBox(height: 10),
             // Task Name Field
             TextField(
               controller: _taskNameController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 border: OutlineInputBorder(),
-                labelText: 'Task Name',
+                labelText: AppLocalizations.of(context)!.taskName,
               ),
             ),
             const SizedBox(height: 10),
@@ -245,7 +248,9 @@ class _TasksCreateModalState extends State<TasksCreateModal> {
                           child: TextField(
                             controller: _subtaskControllers[index],
                             decoration: InputDecoration(
-                              labelText: "Subtask ${index + 1}",
+                              labelText: AppLocalizations.of(
+                                context,
+                              )!.subtaskIndex(index + 1),
                               border: const OutlineInputBorder(),
                             ),
                           ),
@@ -264,7 +269,7 @@ class _TasksCreateModalState extends State<TasksCreateModal> {
                   flex: 4,
                   child: DropdownButtonFormField<String>(
                     value: selectedCategory,
-                    hint: const Text('Select Category'),
+                    hint: Text(AppLocalizations.of(context)!.selectCategory),
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),

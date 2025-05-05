@@ -8,6 +8,7 @@ import 'package:taskify/features/tasks/widgets/tasks_edit_modal.dart';
 import 'package:taskify/features/tasks/widgets/tasks_widget.dart';
 import 'package:taskify/features/tasks/provider/task_provider.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TasksScreen extends StatefulWidget {
   final String? categoryId;
@@ -124,13 +125,25 @@ class _TasksScreenState extends State<TasksScreen> {
       body: ListView(
         children: [
           if (overdueTasks.isNotEmpty)
-            _buildSection('Overdue Tasks', overdueTasks),
+            _buildSection(
+              AppLocalizations.of(context)!.overdueTasks,
+              overdueTasks,
+            ),
           if (todayTasks.isNotEmpty)
-            _buildSection('Today\'s Tasks', todayTasks),
+            _buildSection(
+              AppLocalizations.of(context)!.todaysTasks,
+              todayTasks,
+            ),
           if (futureTasks.isNotEmpty)
-            _buildSection('Future Tasks', futureTasks),
+            _buildSection(
+              AppLocalizations.of(context)!.futureTasks,
+              futureTasks,
+            ),
           if (completedTasks.isNotEmpty)
-            _buildSection('Completed Tasks', completedTasks),
+            _buildSection(
+              AppLocalizations.of(context)!.completedTasks,
+              completedTasks,
+            ),
         ],
       ),
     );

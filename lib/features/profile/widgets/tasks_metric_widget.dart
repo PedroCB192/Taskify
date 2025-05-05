@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:taskify/features/tasks/provider/task_provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TasksMetricWidget extends StatelessWidget {
   const TasksMetricWidget({super.key});
@@ -33,7 +34,7 @@ class TasksMetricWidget extends StatelessWidget {
         children: [
           // Superior part: Total Tasks
           Text(
-            'Total Tasks: $totalTasks',
+            AppLocalizations.of(context)!.totalTasksTotaltasks(totalTasks),
             style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -47,8 +48,8 @@ class TasksMetricWidget extends StatelessWidget {
             children: [
               Column(
                 children: [
-                  const Text(
-                    'Completed Tasks',
+                  Text(
+                    AppLocalizations.of(context)!.completedTasks,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
@@ -67,8 +68,8 @@ class TasksMetricWidget extends StatelessWidget {
               ),
               Column(
                 children: [
-                  const Text(
-                    'Incompleted Tasks',
+                  Text(
+                    AppLocalizations.of(context)!.incompletedTasks,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,

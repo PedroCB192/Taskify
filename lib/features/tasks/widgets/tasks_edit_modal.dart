@@ -8,6 +8,7 @@ import 'package:taskify/features/categories/services/category_service.dart';
 import 'package:provider/provider.dart';
 import 'package:taskify/features/tasks/provider/task_provider.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TasksEditModal extends StatefulWidget {
   final Task task; // Recibe la tarea como parámetro
@@ -82,18 +83,20 @@ class _TaskEditModalState extends State<TasksEditModal> {
             builder: (context, setState) {
               return AlertDialog(
                 backgroundColor: AppColors.backgroundLight,
-                title: const Text('Add new category'),
+                title: Text(AppLocalizations.of(context)!.addNewCategory),
                 content: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     TextField(
                       controller: _categoryController,
-                      decoration: const InputDecoration(
-                        label: Text("Enter category name"),
+                      decoration: InputDecoration(
+                        label: Text(
+                          AppLocalizations.of(context)!.enterCategoryName,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 16),
-                    const Text('Select a color:'),
+                    Text(AppLocalizations.of(context)!.selectAColor),
                     const SizedBox(height: 8),
                     Wrap(
                       spacing: 10,
@@ -129,7 +132,7 @@ class _TaskEditModalState extends State<TasksEditModal> {
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(context),
-                    child: const Text('Cancel'),
+                    child: Text(AppLocalizations.of(context)!.cancel),
                   ),
                   ElevatedButton(
                     onPressed: () async {
@@ -161,7 +164,7 @@ class _TaskEditModalState extends State<TasksEditModal> {
                       _categoryController.clear();
                       Navigator.pop(context);
                     },
-                    child: const Text('Add'),
+                    child: Text(AppLocalizations.of(context)!.add),
                   ),
                 ],
               );
@@ -195,16 +198,16 @@ class _TaskEditModalState extends State<TasksEditModal> {
           children: <Widget>[
             // Title
             Text(
-              'Edit Task',
+              AppLocalizations.of(context)!.editTask,
               style: TextStyle(fontSize: 25, color: AppColors.roseBonbon),
             ),
             const SizedBox(height: 10),
             // Task Name Field
             TextField(
               controller: _taskNameController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 border: OutlineInputBorder(),
-                labelText: 'Task Name',
+                labelText: AppLocalizations.of(context)!.taskName,
               ),
             ),
             const SizedBox(height: 10),
@@ -230,7 +233,9 @@ class _TaskEditModalState extends State<TasksEditModal> {
                           child: TextField(
                             controller: _subtaskControllers[index],
                             decoration: InputDecoration(
-                              labelText: "Subtask ${index + 1}",
+                              labelText: AppLocalizations.of(
+                                context,
+                              )!.subtaskIndex(index + 1),
                               border: const OutlineInputBorder(),
                             ),
                           ),
@@ -250,7 +255,7 @@ class _TaskEditModalState extends State<TasksEditModal> {
                         _categories.any((cat) => cat.id == _selectedCategory)
                             ? _selectedCategory
                             : null, // Aseguramos que la categoría seleccionada sea válida
-                    hint: const Text('Select Category'),
+                    hint: Text(AppLocalizations.of(context)!.selectCategory),
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),

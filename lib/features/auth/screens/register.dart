@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:taskify/core/constants/app_colors.dart';
 import 'package:taskify/features/auth/services/auth_service.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class Register extends StatefulWidget {
   const Register({super.key});
@@ -46,37 +47,43 @@ class _RegisterState extends State<Register> {
       if (user != null) {
         // Registro exitoso
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('¡Registro exitoso!'),
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context)!.accountCreatedSuccessfully,
+            ),
             duration: Duration(seconds: 2),
           ),
         );
         Navigator.of(context).pushReplacementNamed('/tasks');
       }
     } on FirebaseAuthException catch (e) {
-      String message = 'Error al registrar';
+      String message = AppLocalizations.of(context)!.errorToRegister;
       switch (e.code) {
         case 'email-already-in-use':
-          message = 'El email ya está registrado';
+          message = AppLocalizations.of(context)!.theEmailIsAlreadyInUse;
           break;
         case 'invalid-email':
-          message = 'Formato de email inválido';
+          message = AppLocalizations.of(context)!.formatOfEmailIsInvalid;
           break;
         case 'weak-password':
-          message = 'La contraseña debe tener al menos 6 caracteres';
+          // The password
+          message =
+              AppLocalizations.of(
+                context,
+              )!.thePasswordMustBeAtLeast6CharactersLong;
           break;
         case 'operation-not-allowed':
-          message = 'Operación no permitida';
+          message = AppLocalizations.of(context)!.operationNotAllowed;
           break;
         default:
-          message = 'Error desconocido: ${e.message}';
+          message = 'An unexpected error occurred: ${e.message}';
       }
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(message)));
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error inesperado: ${e.toString()}')),
+        SnackBar(content: Text('Unexpected error: ${e.toString()}')),
       );
     } finally {
       setState(() => _isLoading = false);
@@ -107,18 +114,26 @@ class _RegisterState extends State<Register> {
                 // Campo de Username (nuevo)
                 TextFormField(
                   controller: _usernameController,
-                  decoration: const InputDecoration(labelText: 'Username'),
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.username,
+                  ),
                   textCapitalization: TextCapitalization.none,
                   autocorrect: false,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your username';
+                      return AppLocalizations.of(
+                        context,
+                      )!.pleaseEnterYourUsername;
                     }
                     if (value.length < 4) {
-                      return 'The username must be at least 4 characters';
+                      return AppLocalizations.of(
+                        context,
+                      )!.theUsernameMustBeAtLeast4Characters;
                     }
                     if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(value)) {
-                      return 'Only letters, numbers, and underscores are allowed';
+                      return AppLocalizations.of(
+                        context,
+                      )!.onlyLettersNumbersAndUnderscoresAreAllowed;
                     }
                     return null;
                   },
@@ -127,16 +142,20 @@ class _RegisterState extends State<Register> {
                 // Email
                 TextFormField(
                   controller: _emailController,
-                  decoration: const InputDecoration(labelText: 'Email'),
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.email,
+                  ),
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
+                      return AppLocalizations.of(context)!.pleaseEnterYourEmail;
                     }
                     if (!RegExp(
                       r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
                     ).hasMatch(value)) {
-                      return 'Please enter a valid email';
+                      return AppLocalizations.of(
+                        context,
+                      )!.pleaseEnterAValidEmail;
                     }
                     return null;
                   },
@@ -146,13 +165,19 @@ class _RegisterState extends State<Register> {
                 TextFormField(
                   controller: _passwordController,
                   obscureText: true,
-                  decoration: const InputDecoration(labelText: 'Password'),
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.password,
+                  ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your password';
+                      return AppLocalizations.of(
+                        context,
+                      )!.pleaseEnterYourPassword;
                     }
                     if (value.length < 6) {
-                      return 'Password must be at least 6 characters';
+                      return AppLocalizations.of(
+                        context,
+                      )!.passwordMustBeAtLeast6Characters;
                     }
                     return null;
                   },
@@ -167,7 +192,9 @@ class _RegisterState extends State<Register> {
                         child:
                             _isLoading
                                 ? const CircularProgressIndicator()
-                                : const Text('Create Account'),
+                                : Text(
+                                  AppLocalizations.of(context)!.createAccount,
+                                ),
                       ),
                     ),
                   ],

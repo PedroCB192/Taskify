@@ -4,6 +4,7 @@ import 'package:taskify/features/auth/services/auth_service.dart';
 import 'package:taskify/features/profile/provider/user_provider.dart';
 import 'package:taskify/features/profile/widgets/users_profile_widget.dart';
 import 'package:taskify/features/profile/widgets/tasks_metric_widget.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -18,7 +19,7 @@ class ProfileScreen extends StatelessWidget {
         body: Center(
           child: Column(
             children: [
-              Text("No User Data Available"),
+              Text(AppLocalizations.of(context)!.noUserDataAvailable),
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () async {
@@ -61,14 +62,20 @@ class ProfileScreen extends StatelessWidget {
                         context: context,
                         builder:
                             (context) => AlertDialog(
-                              title: const Text('Become Premium'),
-                              content: const Text(
-                                'Unlock premium features by upgrading your account!',
+                              title: Text(
+                                AppLocalizations.of(context)!.becomePremium,
+                              ),
+                              content: Text(
+                                AppLocalizations.of(
+                                  context,
+                                )!.unlockPremiumFeaturesByUpgradingYourAccount,
                               ),
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.pop(context),
-                                  child: const Text('Cancel'),
+                                  child: Text(
+                                    AppLocalizations.of(context)!.cancel,
+                                  ),
                                 ),
                                 ElevatedButton(
                                   onPressed: () {
@@ -76,7 +83,9 @@ class ProfileScreen extends StatelessWidget {
                                     // a la página de pago o suscripción
                                     Navigator.pop(context);
                                   },
-                                  child: const Text('Upgrade Now'),
+                                  child: Text(
+                                    AppLocalizations.of(context)!.upgradeNow,
+                                  ),
                                 ),
                               ],
                             ),

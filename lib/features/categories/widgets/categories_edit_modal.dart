@@ -5,6 +5,7 @@ import 'package:taskify/core/constants/default_colors.dart';
 import 'package:taskify/features/categories/models/category.dart';
 import 'package:taskify/features/categories/services/category_service.dart';
 import 'package:taskify/features/tasks/provider/task_provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CategoriesEditModal extends StatefulWidget {
   final Category category;
@@ -39,7 +40,11 @@ class _CategoriesEditModalState extends State<CategoriesEditModal> {
     final categoryName = _categoryNameController.text.trim();
     if (categoryName.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Category name cannot be empty')),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context)!.categoryNameCannotBeEmpty,
+          ),
+        ),
       );
       return;
     }
@@ -82,20 +87,20 @@ class _CategoriesEditModalState extends State<CategoriesEditModal> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'Edit Category',
+            Text(
+              AppLocalizations.of(context)!.editCategory,
               style: TextStyle(fontSize: 25, color: AppColors.roseBonbon),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: _categoryNameController,
-              decoration: const InputDecoration(
-                labelText: 'Category Name',
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.categoryName,
                 border: OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 16),
-            const Text('Select a Color:'),
+            Text(AppLocalizations.of(context)!.selectAColor),
             const SizedBox(height: 8),
             Wrap(
               spacing: 30,
@@ -154,19 +159,27 @@ class _CategoriesEditModalState extends State<CategoriesEditModal> {
                         context: context,
                         builder:
                             (context) => AlertDialog(
-                              title: const Text('Delete Category'),
-                              content: const Text(
-                                'All tasks associated with this category will be deleted. Are you sure you want to proceed?',
+                              title: Text(
+                                AppLocalizations.of(context)!.deleteCategory,
+                              ),
+                              content: Text(
+                                AppLocalizations.of(
+                                  context,
+                                )!.allTasksAssociatedWithThisCategoryWillBeDeletedAreYouSureYouWantToProceed,
                               ),
                               actions: [
                                 TextButton(
                                   onPressed:
                                       () => Navigator.pop(context, false),
-                                  child: const Text('Cancel'),
+                                  child: Text(
+                                    AppLocalizations.of(context)!.cancel,
+                                  ),
                                 ),
                                 TextButton(
                                   onPressed: () => Navigator.pop(context, true),
-                                  child: const Text('Delete'),
+                                  child: Text(
+                                    AppLocalizations.of(context)!.delete,
+                                  ),
                                 ),
                               ],
                             ),
@@ -195,9 +208,11 @@ class _CategoriesEditModalState extends State<CategoriesEditModal> {
                         } catch (e) {
                           print('Error deleting category and tasks: $e');
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
+                            SnackBar(
                               content: Text(
-                                'Failed to delete category and tasks',
+                                AppLocalizations.of(
+                                  context,
+                                )!.failedToDeleteCategoryAndTasks,
                               ),
                             ),
                           );

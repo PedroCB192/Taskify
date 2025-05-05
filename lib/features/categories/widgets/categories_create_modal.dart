@@ -4,6 +4,7 @@ import 'package:taskify/core/constants/default_colors.dart';
 import 'package:taskify/features/categories/models/category.dart';
 import 'package:taskify/features/categories/services/category_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CategoriesCreateModal extends StatefulWidget {
   const CategoriesCreateModal({super.key});
@@ -28,7 +29,11 @@ class _CategoriesCreateModalState extends State<CategoriesCreateModal> {
     final categoryName = _categoryNameController.text.trim();
     if (categoryName.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Category name cannot be empty')),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context)!.categoryNameCannotBeEmpty,
+          ),
+        ),
       );
       return;
     }
@@ -53,9 +58,11 @@ class _CategoriesCreateModalState extends State<CategoriesCreateModal> {
       Navigator.pop(context, true); // Close modal and notify success
     } catch (e) {
       print('Error saving category: $e');
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Failed to save category')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.failedToSaveCategory),
+        ),
+      );
     } finally {
       setState(() {
         _isSaving = false;
@@ -76,20 +83,20 @@ class _CategoriesCreateModalState extends State<CategoriesCreateModal> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'New Category',
+            Text(
+              AppLocalizations.of(context)!.newCategory,
               style: TextStyle(fontSize: 25, color: AppColors.roseBonbon),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: _categoryNameController,
-              decoration: const InputDecoration(
-                labelText: 'Category Name',
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.categoryName,
                 border: OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 16),
-            const Text('Select a Color:'),
+            Text(AppLocalizations.of(context)!.selectAColor),
             const SizedBox(height: 8),
             Wrap(
               spacing: 30,

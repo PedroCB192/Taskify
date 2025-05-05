@@ -6,6 +6,7 @@ import 'package:taskify/features/tasks/widgets/subtasks_widget.dart';
 import 'package:taskify/features/tasks/provider/task_provider.dart';
 import 'package:taskify/features/tasks/widgets/tasks_edit_modal.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TasksWidget extends StatelessWidget {
   final Task task;
@@ -111,9 +112,11 @@ class TasksWidget extends StatelessWidget {
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Text(
-                    'Due: $formattedDate', // Use the formatted date
+                    AppLocalizations.of(context)!.dueFormatteddate(
+                      formattedDate,
+                    ), // Use the formatted date
                     style: const TextStyle(color: Colors.grey),
                   ),
                 ],
